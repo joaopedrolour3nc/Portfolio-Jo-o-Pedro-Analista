@@ -1535,3 +1535,63 @@ main { flex: 1; }
 .admin-post-row__date  { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); }
 .admin-post-row__del   { flex-shrink: 0; border-color: var(--error) !important; color: var(--error) !important; }
 .admin-post-row__del:hover { background: rgba(255,95,112,0.1) !important; }
+
+/* ============================
+   ADMIN MODAL (embutido no site)
+   ============================ */
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.admin-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+}
+
+.admin-modal__box {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  z-index: 1;
+}
+
+.admin-modal__close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition), color var(--transition);
+}
+.admin-modal__close:hover { background: var(--accent-glow); color: var(--accent); }
+
+.admin-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.editor-toolbar--sm { margin-top: 0; }
+.editor-area--sm    { min-height: 160px; }

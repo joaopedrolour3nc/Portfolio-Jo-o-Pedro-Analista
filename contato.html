@@ -299,5 +299,80 @@
       });
     })();
   </script>
+
+  <!-- ===== ADMIN MODAL (oculto) ===== -->
+  <div id="admin-modal" class="admin-modal" role="dialog" aria-modal="true" aria-label="Login admin" style="display:none;">
+    <div class="admin-modal__backdrop" id="admin-backdrop"></div>
+    <div class="admin-modal__box">
+      <button class="admin-modal__close" id="admin-modal-close" aria-label="Fechar">✕</button>
+      <span class="section__label">// acesso restrito</span>
+      <h2 class="admin-modal__title">Admin</h2>
+
+      <!-- Tela de senha -->
+      <div id="admin-login-view">
+        <div class="form__group" style="margin-top:20px;">
+          <label class="form__label" for="admin-pass-input">Senha</label>
+          <input class="form__input" type="password" id="admin-pass-input" placeholder="••••••" autocomplete="off" />
+          <span class="form__error" id="admin-pass-error" role="alert">Senha incorreta.</span>
+        </div>
+        <button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">
+          Entrar →
+        </button>
+      </div>
+
+      <!-- Painel pós-login -->
+      <div id="admin-panel-view" style="display:none;">
+
+        <div class="form__group" style="margin-top:20px;">
+          <label class="form__label" for="admin-gh-token">
+            Token do GitHub
+            <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span>
+          </label>
+          <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+          <span class="form__error" id="admin-token-error" role="alert">Token inválido ou sem permissão.</span>
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="admin-post-title">Título *</label>
+          <input class="form__input" type="text" id="admin-post-title" placeholder="Título do post" />
+          <span class="form__error" id="admin-title-error" role="alert">Informe o título.</span>
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
+          <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI" />
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="admin-post-content">Conteúdo *</label>
+          <div class="editor-toolbar editor-toolbar--sm">
+            <button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>
+            <button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>
+            <button type="button" class="editor-btn" data-acmd="h2">H2</button>
+            <button type="button" class="editor-btn" data-acmd="h3">H3</button>
+            <button type="button" class="editor-btn" data-acmd="ul">• Lista</button>
+            <button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>
+            <button type="button" class="editor-btn" data-acmd="blockquote">❝</button>
+          </div>
+          <div id="admin-post-content" class="editor-area editor-area--sm"
+            contenteditable="true" data-placeholder="Escreva o post aqui..."></div>
+          <span class="form__error" id="admin-content-error" role="alert">Escreva o conteúdo.</span>
+        </div>
+
+        <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
+
+        <div class="admin-actions">
+          <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
+          <button class="btn btn--primary" id="admin-publish-btn">Publicar →</button>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <a href="blog.html" class="btn btn--outline btn--sm">Ver blog →</a>
+          <button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
