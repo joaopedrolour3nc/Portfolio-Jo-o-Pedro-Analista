@@ -18,8 +18,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Sincroniza ícone com o tema já aplicado
-  setTheme(_savedTheme);
+  // Sincroniza só o ícone — NÃO chama setTheme() para não re-gravar no localStorage
+  // nem disparar a transição de tema ao trocar de página
+  document.querySelectorAll('.theme-toggle__knob').forEach(function (k) {
+    k.textContent = _savedTheme === 'dark' ? '🌙' : '☀️';
+  });
 
   // Clique no toggle
   document.querySelectorAll('.theme-toggle').forEach(function (btn) {

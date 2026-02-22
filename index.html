@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +8,13 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%234f7cff%22/><text x=%2216%22 y=%2223%22 text-anchor=%22middle%22 font-size=%2218%22 font-family=%22monospace%22 fill=%22white%22>JP</text></svg>" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <!-- Tema aplicado antes do render para evitar flash -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
@@ -71,7 +78,7 @@
     </section>
 
     <!-- SOBRE -->
-    <section class="section section--alt" id="sobre" aria-labelledby="sobre-title">
+    <section class="section section--alt section--fade-in" id="sobre" aria-labelledby="sobre-title">
       <div class="container">
         <div class="about">
           <div class="about__text">
@@ -152,7 +159,7 @@
     </section>
 
     <!-- DESTAQUES -->
-    <section class="section section--alt" id="destaques" aria-labelledby="metrics-title">
+    <section class="section section--alt section--fade-in" id="destaques" aria-labelledby="metrics-title">
       <div class="container">
         <span class="section__label">// resultados</span>
         <h2 class="section__title" id="metrics-title">Em números</h2>

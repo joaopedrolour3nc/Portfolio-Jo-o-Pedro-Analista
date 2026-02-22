@@ -328,6 +328,44 @@ main { flex: 1; }
 .section { padding: 72px 0; }
 .section--alt { background: var(--bg-secondary); }
 
+/* Degradê de transição entre seções
+   Usamos pseudo-elementos pois linear-gradient não interpola variáveis CSS.
+   Os pseudo-elementos ficam em cima da seção, nas bordas, fazendo o fade. */
+.section--fade-in {
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+.section--fade-in::before,
+.section--fade-in::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 80px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Fade de entrada (topo): bg-primary → bg-secondary */
+.section--fade-in::before {
+  top: 0;
+  background: linear-gradient(to bottom, #0a0c10 0%, transparent 100%);
+}
+
+/* Fade de saída (base): bg-secondary → bg-primary */
+.section--fade-in::after {
+  bottom: 0;
+  background: linear-gradient(to top, #0a0c10 0%, transparent 100%);
+}
+
+/* Versão light */
+[data-theme="light"] .section--fade-in::before {
+  background: linear-gradient(to bottom, #f4f6fb 0%, transparent 100%);
+}
+[data-theme="light"] .section--fade-in::after {
+  background: linear-gradient(to top, #f4f6fb 0%, transparent 100%);
+}
+
 .section__label {
   font-family: var(--font-mono);
   font-size: 0.68rem;
