@@ -29,9 +29,9 @@ const PROJECTS = [
     titulo: "Dashboard Comercial — Power BI",
     descricaoCurta: "Painel interativo de KPIs comerciais com análise de receita, funil de vendas e metas por regional. Conectado a banco SQL Server via DirectQuery.",
     stack: ["Power BI", "SQL Server", "DAX"],
-    data: "23-02-2026",
+    data: "11-2024",
     links: {
-      github: "https://github.com/seuusuario/dashboard-comercial",
+      github: "https://github.com/joaopedrolour3nc/dashboard-comercial",
       demo: null,
     },
     imagem: "📊",
@@ -45,7 +45,7 @@ const PROJECTS = [
     stack: ["PostgreSQL", "SQL", "DBeaver"],
     data: "08-2024",
     links: {
-      github: "https://github.com/seuusuario/analise-churn-sql",
+      github: "https://github.com/joaopedrolour3nc/analise-churn-sql",
       demo: null,
     },
     imagem: "🔍",
@@ -59,7 +59,7 @@ const PROJECTS = [
     stack: ["Python", "Pandas", "BigQuery", "GCP"],
     data: "05-2024",
     links: {
-      github: "https://github.com/seuusuario/pipeline-etl-bq",
+      github: "https://github.com/joaopedrolour3nc/pipeline-etl-bq",
       demo: null,
     },
     imagem: "⚙️",
@@ -73,7 +73,7 @@ const PROJECTS = [
     stack: ["Excel", "VBA", "Python", "openpyxl"],
     data: "02-2024",
     links: {
-      github: "https://github.com/seuusuario/automacao-excel",
+      github: "https://github.com/joaopedrolour3nc/automacao-excel",
       demo: null,
     },
     imagem: "📁",
