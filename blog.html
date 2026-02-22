@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Blog de João Pedro — Analista de Dados. Artigos sobre dados, SQL, Python e Power BI." />
+  <meta name="description" content="Blog de João Pedro — Analista de Dados." />
   <title>Blog — João Pedro · Analista de Dados</title>
   <script>(function(){ var t=localStorage.getItem('theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
   <link rel="stylesheet" href="assets/css/styles.css" />
@@ -36,241 +36,159 @@
   </header>
 
   <main class="page">
-    <div class="container">
 
-      <div class="projects-header">
-        <span class="section__label">// blog</span>
-        <h1 class="section__title">Artigos & Insights</h1>
-        <p class="section__desc">Análises, aprendizados e reflexões sobre dados, ferramentas e carreira.</p>
+    <!-- LISTA DE POSTS -->
+    <div id="blog-list-view">
+      <div class="container">
+        <div class="projects-header">
+          <span class="section__label">// blog</span>
+          <h1 class="section__title">Artigos & Insights</h1>
+          <p class="section__desc">Análises, aprendizados e reflexões sobre dados, ferramentas e carreira.</p>
+        </div>
+
+        <div id="blog-loading" class="blog-loading">
+          <div class="blog-loading__spinner"></div>
+          <span>Carregando posts...</span>
+        </div>
+
+        <div id="blog-grid" class="blog-grid" style="display:none;"></div>
+
+        <div id="blog-empty" class="empty-state" style="display:none;">
+          <div class="empty-state__icon">✍️</div>
+          <div class="empty-state__title">Nenhum post ainda</div>
+          <div class="empty-state__desc">Em breve terei conteúdo por aqui.</div>
+        </div>
+
+        <div style="height:80px;"></div>
       </div>
+    </div>
 
-      <!-- Estado de carregamento -->
-      <div id="blog-loading" class="blog-loading">
-        <div class="blog-loading__spinner"></div>
-        <span>Carregando posts...</span>
-      </div>
-
-      <!-- Grid de posts -->
-      <div id="blog-grid" class="blog-grid" style="display:none;"></div>
-
-      <!-- Estado vazio -->
-      <div id="blog-empty" class="empty-state" style="display:none;">
-        <div class="empty-state__icon">✍️</div>
-        <div class="empty-state__title">Nenhum post ainda</div>
-        <div class="empty-state__desc">Em breve terei conteúdo por aqui.</div>
-      </div>
-
-      <!-- Modal de leitura do post -->
-      <div id="post-modal" class="post-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="display:none;">
-        <div class="post-modal__backdrop" id="modal-backdrop"></div>
-        <div class="post-modal__box">
-          <button class="post-modal__close" id="modal-close" aria-label="Fechar post">✕</button>
-          <div class="post-modal__inner">
-            <div class="post-modal__meta">
-              <span id="modal-date" class="post-modal__date"></span>
-              <div id="modal-tags" class="chips"></div>
-            </div>
-            <h2 id="modal-title" class="post-modal__title"></h2>
-            <div id="modal-body" class="post-modal__body"></div>
-          </div>
+    <!-- LEITURA DE POST (página inteira) -->
+    <div id="blog-post-view" style="display:none;">
+      <div class="post-page">
+        <div class="container">
+          <button class="post-page__back" id="post-back-btn">
+            ← Voltar ao blog
+          </button>
+          <article class="post-article">
+            <header class="post-article__header">
+              <div class="post-article__meta">
+                <span id="post-view-date" class="post-article__date"></span>
+                <div id="post-view-tags" class="chips"></div>
+              </div>
+              <h1 id="post-view-title" class="post-article__title"></h1>
+              <div class="post-article__divider"></div>
+            </header>
+            <div id="post-view-body" class="post-article__body"></div>
+          </article>
         </div>
       </div>
-
-      <div style="height:80px;"></div>
     </div>
+
   </main>
 
-  <footer class="footer">
+  <footer class="footer" id="blog-footer">
     <div class="container footer__inner">
       <div class="footer__links">
-        <a href="https://github.com/joaopedrolour3nc" target="_blank" rel="noopener" class="footer__link">GitHub</a>
+        <a href="https://github.com/joaopedrolour3nc"         target="_blank" rel="noopener" class="footer__link">GitHub</a>
         <a href="https://www.linkedin.com/in/joaopedrolour3nc/" target="_blank" rel="noopener" class="footer__link">LinkedIn</a>
       </div>
       <p class="footer__copy">© <span class="footer__year"></span> João Pedro — Analista de Dados</p>
     </div>
   </footer>
 
+  <!-- Admin modal (injetado pelo main.js) -->
+
   <script src="assets/js/main.js"></script>
   <script>
-    /* ============================================================
-       blog.js — Lê posts.json do GitHub e renderiza
-    ============================================================ */
-
-    // CONFIGURAÇÃO — altere para o seu repositório
     var REPO_OWNER = 'joaopedrolour3nc';
     var REPO_NAME  = 'Portfolio-Jo-o-Pedro-Analista';
-    var POSTS_FILE = 'posts.json';
+    var DATA_FILE  = 'data.json';
     var BRANCH     = 'main';
+    var RAW_URL    = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + DATA_FILE + '?nocache=' + Date.now();
 
-    var RAW_URL = 'https://raw.githubusercontent.com/' +
-      REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + POSTS_FILE +
-      '?nocache=' + Date.now(); // evita cache do browser
-
-    function formatDate(iso) {
+    function formatPostDate(iso) {
       var d = new Date(iso);
-      var months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      var months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
       return d.getDate() + ' de ' + months[d.getMonth()] + ' de ' + d.getFullYear();
     }
 
-    function renderPosts(posts) {
-      var loading = document.getElementById('blog-loading');
-      var grid    = document.getElementById('blog-grid');
-      var empty   = document.getElementById('blog-empty');
+    function showPost(post) {
+      document.getElementById('blog-list-view').style.display = 'none';
+      document.getElementById('blog-footer').style.display = 'none';
 
-      loading.style.display = 'none';
+      var view = document.getElementById('blog-post-view');
+      view.style.display = 'block';
+
+      document.getElementById('post-view-title').textContent = post.title;
+      document.getElementById('post-view-date').textContent  = formatPostDate(post.date);
+      document.getElementById('post-view-body').innerHTML    = post.content || '';
+      document.getElementById('post-view-tags').innerHTML    = (post.tags || [])
+        .map(function(t){ return '<span class="chip">' + t + '</span>'; }).join('');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.title = post.title + ' — João Pedro';
+    }
+
+    function showList() {
+      document.getElementById('blog-post-view').style.display  = 'none';
+      document.getElementById('blog-list-view').style.display  = 'block';
+      document.getElementById('blog-footer').style.display     = '';
+      document.title = 'Blog — João Pedro · Analista de Dados';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('post-back-btn').addEventListener('click', showList);
+
+    function renderPosts(posts) {
+      document.getElementById('blog-loading').style.display = 'none';
 
       if (!posts || posts.length === 0) {
-        empty.style.display = 'block';
+        document.getElementById('blog-empty').style.display = 'block';
         return;
       }
 
-      // Ordena do mais recente para o mais antigo
-      posts.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+      posts.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
 
+      var grid = document.getElementById('blog-grid');
       grid.style.display = 'grid';
       grid.innerHTML = '';
 
       posts.forEach(function(post) {
-        var tags = (post.tags || []).map(function(t) {
-          return '<span class="chip">' + t + '</span>';
-        }).join('');
-
-        var preview = post.content
-          ? post.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...'
-          : '';
+        var tags = (post.tags || []).map(function(t){ return '<span class="chip">' + t + '</span>'; }).join('');
+        var plain = (post.content || '').replace(/<[^>]*>/g, '');
+        var preview = plain.length > 180 ? plain.substring(0, 180) + '…' : plain;
 
         var card = document.createElement('article');
         card.className = 'blog-card';
         card.innerHTML =
           '<div class="blog-card__body">' +
             '<div class="blog-card__meta">' +
-              '<span class="blog-card__date">' + formatDate(post.date) + '</span>' +
+              '<span class="blog-card__date">' + formatPostDate(post.date) + '</span>' +
             '</div>' +
             '<h2 class="blog-card__title">' + post.title + '</h2>' +
             '<p class="blog-card__preview">' + preview + '</p>' +
             '<div class="chips blog-card__tags">' + tags + '</div>' +
-            '<button class="btn btn--outline btn--sm blog-card__btn">Ler post →</button>' +
+            '<button class="btn btn--outline btn--sm blog-card__btn">Ler artigo →</button>' +
           '</div>';
 
-        card.querySelector('.blog-card__btn').addEventListener('click', function() {
-          openModal(post);
+        card.querySelector('.blog-card__btn').addEventListener('click', function(){ showPost(post); });
+        card.addEventListener('click', function(e){
+          if (!e.target.closest('button')) showPost(post);
         });
+        card.style.cursor = 'pointer';
 
         grid.appendChild(card);
       });
     }
 
-    function openModal(post) {
-      var modal = document.getElementById('post-modal');
-      document.getElementById('modal-title').textContent = post.title;
-      document.getElementById('modal-date').textContent  = formatDate(post.date);
-      document.getElementById('modal-body').innerHTML    = post.content || '';
-      var tagsEl = document.getElementById('modal-tags');
-      tagsEl.innerHTML = (post.tags || []).map(function(t) {
-        return '<span class="chip">' + t + '</span>';
-      }).join('');
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-      document.getElementById('post-modal').style.display = 'none';
-      document.body.style.overflow = '';
-    }
-
-    document.getElementById('modal-close').addEventListener('click', closeModal);
-    document.getElementById('modal-backdrop').addEventListener('click', closeModal);
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeModal();
-    });
-
-    // Carrega os posts
     fetch(RAW_URL)
-      .then(function(res) {
-        if (!res.ok) throw new Error('Erro ao carregar posts');
-        return res.json();
-      })
-      .then(renderPosts)
-      .catch(function() {
+      .then(function(r){ return r.json(); })
+      .then(function(data){ renderPosts(data.posts || []); })
+      .catch(function(){ 
         document.getElementById('blog-loading').style.display = 'none';
-        document.getElementById('blog-empty').style.display = 'block';
+        document.getElementById('blog-empty').style.display   = 'block';
       });
   </script>
-
-  <!-- ===== ADMIN MODAL (oculto) ===== -->
-  <div id="admin-modal" class="admin-modal" role="dialog" aria-modal="true" aria-label="Login admin" style="display:none;">
-    <div class="admin-modal__backdrop" id="admin-backdrop"></div>
-    <div class="admin-modal__box">
-      <button class="admin-modal__close" id="admin-modal-close" aria-label="Fechar">✕</button>
-      <span class="section__label">// acesso restrito</span>
-      <h2 class="admin-modal__title">Admin</h2>
-
-      <!-- Tela de senha -->
-      <div id="admin-login-view">
-        <div class="form__group" style="margin-top:20px;">
-          <label class="form__label" for="admin-pass-input">Senha</label>
-          <input class="form__input" type="password" id="admin-pass-input" placeholder="••••••" autocomplete="off" />
-          <span class="form__error" id="admin-pass-error" role="alert">Senha incorreta.</span>
-        </div>
-        <button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">
-          Entrar →
-        </button>
-      </div>
-
-      <!-- Painel pós-login -->
-      <div id="admin-panel-view" style="display:none;">
-
-        <div class="form__group" style="margin-top:20px;">
-          <label class="form__label" for="admin-gh-token">
-            Token do GitHub
-            <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span>
-          </label>
-          <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-          <span class="form__error" id="admin-token-error" role="alert">Token inválido ou sem permissão.</span>
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-title">Título *</label>
-          <input class="form__input" type="text" id="admin-post-title" placeholder="Título do post" />
-          <span class="form__error" id="admin-title-error" role="alert">Informe o título.</span>
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
-          <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI" />
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-content">Conteúdo *</label>
-          <div class="editor-toolbar editor-toolbar--sm">
-            <button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>
-            <button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>
-            <button type="button" class="editor-btn" data-acmd="h2">H2</button>
-            <button type="button" class="editor-btn" data-acmd="h3">H3</button>
-            <button type="button" class="editor-btn" data-acmd="ul">• Lista</button>
-            <button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>
-            <button type="button" class="editor-btn" data-acmd="blockquote">❝</button>
-          </div>
-          <div id="admin-post-content" class="editor-area editor-area--sm"
-            contenteditable="true" data-placeholder="Escreva o post aqui..."></div>
-          <span class="form__error" id="admin-content-error" role="alert">Escreva o conteúdo.</span>
-        </div>
-
-        <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
-
-        <div class="admin-actions">
-          <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
-          <button class="btn btn--primary" id="admin-publish-btn">Publicar →</button>
-        </div>
-
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-          <a href="blog.html" class="btn btn--outline btn--sm">Ver blog →</a>
-          <button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </body>
 </html>

@@ -1,60 +1,55 @@
 /* ============================================================
-   main.js — Menu mobile, tema, utilidades
+   main.js — Tema, menu mobile, admin modal
    ============================================================ */
 
-/* ---- Aplica tema salvo antes de qualquer render ---- */
+/* ---- Tema: aplica antes do render para evitar flash ---- */
+function updateToggleIcon(theme) {
+  document.querySelectorAll('.theme-toggle__knob').forEach(function(k) {
+    k.textContent = theme === 'dark' ? '🌙' : '☀️';
+  });
+}
 var _savedTheme = localStorage.getItem('theme') || 'dark';
 document.documentElement.setAttribute('data-theme', _savedTheme);
 
-/* ---- Tudo o mais só roda com DOM pronto ---- */
-document.addEventListener('DOMContentLoaded', function () {
+/* ============================================================
+   CONFIG GLOBAL (usada pelo admin)
+   ============================================================ */
+var REPO_OWNER = 'joaopedrolour3nc';
+var REPO_NAME  = 'Portfolio-Jo-o-Pedro-Analista';
+var DATA_FILE  = 'data.json';
+var BRANCH     = 'main';
+var API_BASE   = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + DATA_FILE;
+var ADMIN_PASS = '121246';
 
-  /* ---------- TEMA ---------- */
-  function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    document.querySelectorAll('.theme-toggle__knob').forEach(function (k) {
-      k.textContent = theme === 'dark' ? '🌙' : '☀️';
-    });
-  }
+document.addEventListener('DOMContentLoaded', function() {
 
-  // Sincroniza só o ícone — NÃO chama setTheme() para não re-gravar no localStorage
-  // nem disparar a transição de tema ao trocar de página
-  document.querySelectorAll('.theme-toggle__knob').forEach(function (k) {
-    k.textContent = _savedTheme === 'dark' ? '🌙' : '☀️';
-  });
-
-  // Clique no toggle
-  document.querySelectorAll('.theme-toggle').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var current = document.documentElement.getAttribute('data-theme');
-      setTheme(current === 'dark' ? 'light' : 'dark');
+  /* ---- Ícone do tema ---- */
+  updateToggleIcon(_savedTheme);
+  document.querySelectorAll('.theme-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateToggleIcon(next);
     });
   });
 
-  /* ---------- MENU MOBILE ---------- */
+  /* ---- Menu mobile ---- */
   var navToggle = document.querySelector('.nav-toggle');
   var nav       = document.querySelector('.nav');
-
   if (navToggle && nav) {
-
-    navToggle.addEventListener('click', function (e) {
-      e.stopPropagation(); // evita que o click-outside feche antes de abrir
-      var willOpen = !nav.classList.contains('open');
-      nav.classList.toggle('open');
-      navToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    navToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var isOpen = nav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
-
-    // Fecha ao clicar num link
-    nav.querySelectorAll('.nav__link').forEach(function (link) {
-      link.addEventListener('click', function () {
+    nav.querySelectorAll('.nav__link').forEach(function(link) {
+      link.addEventListener('click', function() {
         nav.classList.remove('open');
         navToggle.setAttribute('aria-expanded', 'false');
       });
     });
-
-    // Fecha ao clicar fora
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
       if (nav.classList.contains('open') && !nav.contains(e.target)) {
         nav.classList.remove('open');
         navToggle.setAttribute('aria-expanded', 'false');
@@ -62,87 +57,170 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* ---------- LINK ATIVO ---------- */
+  /* ---- Link ativo no nav ---- */
   var currentFile = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav__link').forEach(function (link) {
-    if (link.getAttribute('href') === currentFile) {
-      link.classList.add('active');
-    }
+  document.querySelectorAll('.nav__link').forEach(function(link) {
+    if (link.getAttribute('href') === currentFile) link.classList.add('active');
   });
 
-  /* ---------- COPYRIGHT ---------- */
-  document.querySelectorAll('.footer__year').forEach(function (el) {
+  /* ---- Copyright ---- */
+  document.querySelectorAll('.footer__year').forEach(function(el) {
     el.textContent = new Date().getFullYear();
   });
 
-  /* ---------- TOAST ---------- */
-  window.showToast = function (opts) {
-    opts = opts || {};
-    var icon     = opts.icon     || '✅';
-    var title    = opts.title    || 'Sucesso!';
-    var body     = opts.body     || '';
-    var type     = opts.type     || 'success';
-    var duration = opts.duration || 4000;
-
-    var toast = document.querySelector('.toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      document.body.appendChild(toast);
-    }
-    toast.className = 'toast toast--' + type;
-    toast.innerHTML =
-      '<div class="toast__icon">' + icon + '</div>' +
-      '<div><div class="toast__title">' + title + '</div>' +
-      '<div class="toast__body">' + body + '</div></div>';
-
-    toast.classList.add('show');
-    clearTimeout(toast._tid);
-    toast._tid = setTimeout(function () { toast.classList.remove('show'); }, duration);
-  };
-
-});
-
-/* ============================================================
-   ADMIN MODAL — ativado clicando 5x no nome do header
-   ============================================================ */
-document.addEventListener('DOMContentLoaded', function () {
-
-  var ADMIN_PASS = '121246';
-  var REPO_OWNER = 'joaopedrolour3nc';
-  var REPO_NAME  = 'Portfolio-Jo-o-Pedro-Analista';
-  var POSTS_FILE = 'posts.json';
-  var BRANCH     = 'main';
-  var API_BASE   = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + POSTS_FILE;
-
-  /* ---- Gatilho: 5 cliques no nome ---- */
+  /* ============================================================
+     ADMIN MODAL — 5 cliques no nome abre o painel
+     ============================================================ */
   var logoName   = document.querySelector('.header__logo-name');
-  var clickCount = 0;
-  var clickTimer = null;
+  var clickCount = 0, clickTimer = null;
 
   if (logoName) {
-    logoName.style.cursor = 'default';
-    logoName.addEventListener('click', function (e) {
+    logoName.style.userSelect = 'none';
+    logoName.addEventListener('click', function(e) {
       e.preventDefault();
       clickCount++;
       clearTimeout(clickTimer);
-      clickTimer = setTimeout(function () { clickCount = 0; }, 2000);
-      if (clickCount >= 5) {
-        clickCount = 0;
-        openAdminModal();
-      }
+      clickTimer = setTimeout(function(){ clickCount = 0; }, 2000);
+      if (clickCount >= 5) { clickCount = 0; openAdminModal(); }
     });
   }
 
-  /* ---- Abrir / fechar modal ---- */
+  /* ---- Injeta o HTML da modal se ainda não existe ---- */
+  function ensureModal() {
+    if (document.getElementById('admin-modal')) return;
+    var div = document.createElement('div');
+    div.innerHTML = ADMIN_MODAL_HTML;
+    document.body.appendChild(div.firstElementChild);
+    bindModalEvents();
+  }
+
+  var ADMIN_MODAL_HTML = '<div id="admin-modal" class="admin-modal" role="dialog" aria-modal="true" style="display:none;">' +
+    '<div class="admin-modal__backdrop" id="admin-backdrop"></div>' +
+    '<div class="admin-modal__box">' +
+      '<button class="admin-modal__close" id="admin-modal-close" aria-label="Fechar">✕</button>' +
+      '<span class="section__label">// acesso restrito</span>' +
+      '<h2 class="admin-modal__title">Publicar conteúdo</h2>' +
+
+      /* Tela de senha */
+      '<div id="admin-login-view">' +
+        '<div class="form__group" style="margin-top:20px;">' +
+          '<label class="form__label" for="admin-pass-input">Senha</label>' +
+          '<input class="form__input" type="password" id="admin-pass-input" placeholder="••••••" autocomplete="off"/>' +
+          '<span class="form__error" id="admin-pass-error">Senha incorreta.</span>' +
+        '</div>' +
+        '<button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">Entrar →</button>' +
+      '</div>' +
+
+      /* Painel pós-login */
+      '<div id="admin-panel-view" style="display:none;">' +
+
+        /* Token */
+        '<div class="form__group" style="margin-top:20px;">' +
+          '<label class="form__label" for="admin-gh-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span></label>' +
+          '<input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>' +
+          '<span class="form__error" id="admin-token-error">Token inválido ou sem permissão.</span>' +
+        '</div>' +
+
+        /* Destino */
+        '<div class="form__group">' +
+          '<label class="form__label">Publicar em</label>' +
+          '<div class="admin-dest-tabs">' +
+            '<button type="button" class="admin-dest-tab admin-dest-tab--active" data-dest="blog">✍️ Blog</button>' +
+            '<button type="button" class="admin-dest-tab" data-dest="projects">📁 Projetos</button>' +
+            '<button type="button" class="admin-dest-tab" data-dest="both">✦ Ambos</button>' +
+          '</div>' +
+        '</div>' +
+
+        /* Campos comuns */
+        '<div class="form__group">' +
+          '<label class="form__label" for="admin-post-title">Título *</label>' +
+          '<input class="form__input" type="text" id="admin-post-title" placeholder="Título"/>' +
+          '<span class="form__error" id="admin-title-error">Informe o título.</span>' +
+        '</div>' +
+        '<div class="form__group">' +
+          '<label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>' +
+          '<input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI"/>' +
+        '</div>' +
+
+        /* Campos exclusivos de projetos */
+        '<div id="admin-project-fields" style="display:none;">' +
+          '<div class="form__row">' +
+            '<div class="form__group">' +
+              '<label class="form__label" for="admin-proj-stack">Stack <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>' +
+              '<input class="form__input" type="text" id="admin-proj-stack" placeholder="Python, SQL, Power BI"/>' +
+            '</div>' +
+            '<div class="form__group">' +
+              '<label class="form__label" for="admin-proj-data">Data <span style="color:var(--text-muted);font-size:0.62rem;">(MM-AAAA ou DD-MM-AAAA)</span></label>' +
+              '<input class="form__input" type="text" id="admin-proj-data" placeholder="02-2026"/>' +
+            '</div>' +
+          '</div>' +
+          '<div class="form__row">' +
+            '<div class="form__group">' +
+              '<label class="form__label" for="admin-proj-github">Link GitHub</label>' +
+              '<input class="form__input" type="url" id="admin-proj-github" placeholder="https://github.com/..."/>' +
+            '</div>' +
+            '<div class="form__group">' +
+              '<label class="form__label" for="admin-proj-demo">Link Demo</label>' +
+              '<input class="form__input" type="url" id="admin-proj-demo" placeholder="https://..."/>' +
+            '</div>' +
+          '</div>' +
+          '<div class="form__row">' +
+            '<div class="form__group">' +
+              '<label class="form__label" for="admin-proj-imagem">Imagem <span style="color:var(--text-muted);font-size:0.62rem;">(emoji ou URL)</span></label>' +
+              '<input class="form__input" type="text" id="admin-proj-imagem" placeholder="📊 ou https://..."/>' +
+            '</div>' +
+            '<div class="form__group" style="display:flex;align-items:flex-end;padding-bottom:2px;">' +
+              '<label class="admin-check-label">' +
+                '<input type="checkbox" id="admin-proj-destaque"/> Marcar como destaque' +
+              '</label>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        /* Campo de descrição curta (só projetos) */
+        '<div id="admin-desc-field" class="form__group" style="display:none;">' +
+          '<label class="form__label" for="admin-proj-desc">Descrição curta *</label>' +
+          '<textarea class="form__textarea" id="admin-proj-desc" placeholder="Resumo do projeto..." style="min-height:80px;"></textarea>' +
+          '<span class="form__error" id="admin-desc-error">Informe a descrição.</span>' +
+        '</div>' +
+
+        /* Editor rico (blog / ambos) */
+        '<div id="admin-editor-field" class="form__group">' +
+          '<label class="form__label" for="admin-post-content">Conteúdo *</label>' +
+          '<div class="editor-toolbar editor-toolbar--sm">' +
+            '<button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>' +
+            '<button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>' +
+            '<button type="button" class="editor-btn" data-acmd="h2">H2</button>' +
+            '<button type="button" class="editor-btn" data-acmd="h3">H3</button>' +
+            '<button type="button" class="editor-btn" data-acmd="ul">• Lista</button>' +
+            '<button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>' +
+            '<button type="button" class="editor-btn" data-acmd="blockquote">❝</button>' +
+          '</div>' +
+          '<div id="admin-post-content" class="editor-area editor-area--sm" contenteditable="true" data-placeholder="Escreva o conteúdo aqui..."></div>' +
+          '<span class="form__error" id="admin-content-error">Escreva o conteúdo.</span>' +
+        '</div>' +
+
+        '<div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>' +
+
+        '<div class="admin-actions">' +
+          '<button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>' +
+          '<button class="btn btn--primary" id="admin-publish-btn">Publicar →</button>' +
+        '</div>' +
+
+        '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">' +
+          '<a href="blog.html" class="btn btn--outline btn--sm">Ver blog →</a>' +
+          '<button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>' +
+        '</div>' +
+      '</div>' + /* /admin-panel-view */
+    '</div>' + /* /admin-modal__box */
+  '</div>'; /* /admin-modal */
+
   function openAdminModal() {
+    ensureModal();
     var modal = document.getElementById('admin-modal');
-    if (!modal) return;
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    setTimeout(function () {
-      var inp = document.getElementById('admin-pass-input');
-      if (inp) inp.focus();
-    }, 100);
+    setTimeout(function(){ var el = document.getElementById('admin-pass-input'); if(el) el.focus(); }, 100);
   }
 
   function closeAdminModal() {
@@ -150,209 +228,244 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!modal) return;
     modal.style.display = 'none';
     document.body.style.overflow = '';
-    // Volta para tela de senha
-    showView('login');
+    showAdminView('login');
     var inp = document.getElementById('admin-pass-input');
     if (inp) inp.value = '';
-    clearStatus();
+    setAdminStatus('','');
   }
 
-  function showView(view) {
-    var loginView = document.getElementById('admin-login-view');
-    var panelView = document.getElementById('admin-panel-view');
-    if (!loginView || !panelView) return;
-    if (view === 'login') {
-      loginView.style.display = 'block';
-      panelView.style.display = 'none';
-    } else {
-      loginView.style.display = 'none';
-      panelView.style.display = 'block';
-    }
+  function showAdminView(view) {
+    var lv = document.getElementById('admin-login-view');
+    var pv = document.getElementById('admin-panel-view');
+    if (!lv || !pv) return;
+    lv.style.display = view === 'login' ? 'block' : 'none';
+    pv.style.display = view === 'panel' ? 'block' : 'none';
   }
 
-  var closeBtn   = document.getElementById('admin-modal-close');
-  var backdrop   = document.getElementById('admin-backdrop');
-  if (closeBtn)  closeBtn.addEventListener('click', closeAdminModal);
-  if (backdrop)  backdrop.addEventListener('click', closeAdminModal);
-  document.addEventListener('keydown', function (e) {
-    var modal = document.getElementById('admin-modal');
-    if (e.key === 'Escape' && modal && modal.style.display !== 'none') closeAdminModal();
-  });
+  function bindModalEvents() {
 
-  /* ---- Login ---- */
-  var passBtn   = document.getElementById('admin-pass-btn');
-  var passInput = document.getElementById('admin-pass-input');
-  var passError = document.getElementById('admin-pass-error');
+    /* Close */
+    document.getElementById('admin-modal-close').addEventListener('click', closeAdminModal);
+    document.getElementById('admin-backdrop').addEventListener('click', closeAdminModal);
 
-  function doLogin() {
-    if (!passInput) return;
-    if (passInput.value === ADMIN_PASS) {
-      if (passError) passError.style.display = 'none';
-      passInput.classList.remove('error');
-      showView('panel');
-    } else {
-      if (passError) passError.style.display = 'block';
-      passInput.classList.add('error');
-      passInput.value = '';
-      passInput.focus();
-    }
-  }
+    /* Login */
+    var passBtn = document.getElementById('admin-pass-btn');
+    var passInp = document.getElementById('admin-pass-input');
+    var passErr = document.getElementById('admin-pass-error');
 
-  if (passBtn)   passBtn.addEventListener('click', doLogin);
-  if (passInput) passInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') doLogin();
-  });
-
-  var logoutBtn = document.getElementById('admin-logout-btn');
-  if (logoutBtn) logoutBtn.addEventListener('click', function () {
-    showView('login');
-    if (passInput) passInput.value = '';
-  });
-
-  /* ---- Editor de rich text ---- */
-  var editorArea = document.getElementById('admin-post-content');
-
-  document.querySelectorAll('.editor-btn[data-acmd]').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (editorArea) editorArea.focus();
-      var cmd = btn.dataset.acmd;
-      if      (cmd === 'bold')       document.execCommand('bold');
-      else if (cmd === 'italic')     document.execCommand('italic');
-      else if (cmd === 'h2')         document.execCommand('formatBlock', false, 'h2');
-      else if (cmd === 'h3')         document.execCommand('formatBlock', false, 'h3');
-      else if (cmd === 'ul')         document.execCommand('insertUnorderedList');
-      else if (cmd === 'blockquote') document.execCommand('formatBlock', false, 'blockquote');
-      else if (cmd === 'code') {
-        var sel = window.getSelection();
-        if (sel && sel.toString()) {
-          document.execCommand('insertHTML', false, '<code>' + sel.toString() + '</code>');
-        }
+    function doLogin() {
+      if (passInp.value === ADMIN_PASS) {
+        passErr.style.display = 'none';
+        passInp.classList.remove('error');
+        showAdminView('panel');
+      } else {
+        passErr.style.display = 'block';
+        passInp.classList.add('error');
+        passInp.value = '';
+        passInp.focus();
       }
+    }
+    passBtn.addEventListener('click', doLogin);
+    passInp.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+
+    document.getElementById('admin-logout-btn').addEventListener('click', function(){
+      showAdminView('login');
+      if(passInp) passInp.value='';
     });
-  });
 
-  /* ---- Limpar ---- */
-  var clearBtn = document.getElementById('admin-clear-btn');
-  if (clearBtn) clearBtn.addEventListener('click', function () {
-    if (!confirm('Limpar formulário?')) return;
-    var t = document.getElementById('admin-post-title');
-    var g = document.getElementById('admin-post-tags');
-    if (t) t.value = '';
-    if (g) g.value = '';
-    if (editorArea) editorArea.innerHTML = '';
-    clearStatus();
-  });
-
-  /* ---- Status ---- */
-  function setStatus(msg, type) {
-    var el = document.getElementById('admin-publish-status');
-    if (!el) return;
-    if (!msg) { el.style.display = 'none'; return; }
-    el.style.display = 'block';
-    el.className = 'publish-status publish-status--' + type;
-    el.textContent = msg;
-  }
-  function clearStatus() { setStatus('', ''); }
-
-  /* ---- API GitHub ---- */
-  function getToken() {
-    var el = document.getElementById('admin-gh-token');
-    return el ? el.value.trim() : '';
-  }
-
-  function fetchPosts(token) {
-    var headers = { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + token };
-    return fetch(API_BASE + '?ref=' + BRANCH + '&t=' + Date.now(), { headers: headers })
-      .then(function (res) { if (!res.ok) throw new Error('fetch'); return res.json(); })
-      .then(function (data) {
-        var json = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
-        return { posts: JSON.parse(json), sha: data.sha };
+    /* ---- Abas de destino ---- */
+    var currentDest = 'blog';
+    document.querySelectorAll('.admin-dest-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.admin-dest-tab').forEach(function(t){ t.classList.remove('admin-dest-tab--active'); });
+        tab.classList.add('admin-dest-tab--active');
+        currentDest = tab.dataset.dest;
+        updateDestinationFields(currentDest);
       });
-  }
+    });
 
-  function savePosts(posts, sha, token) {
-    var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(posts, null, 2))));
-    return fetch(API_BASE, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type':  'application/json',
-        'Accept':        'application/vnd.github+json',
-      },
-      body: JSON.stringify({ message: 'post: ' + new Date().toISOString(), content: encoded, sha: sha, branch: BRANCH }),
-    }).then(function (res) { if (!res.ok) throw new Error('save'); return res.json(); });
-  }
+    function updateDestinationFields(dest) {
+      var projFields  = document.getElementById('admin-project-fields');
+      var descField   = document.getElementById('admin-desc-field');
+      var editorField = document.getElementById('admin-editor-field');
 
-  /* ---- Publicar ---- */
-  var publishBtn = document.getElementById('admin-publish-btn');
-  if (publishBtn) publishBtn.addEventListener('click', function () {
-    var token   = getToken();
-    var titleEl = document.getElementById('admin-post-title');
-    var tagsEl  = document.getElementById('admin-post-tags');
-    var title   = titleEl ? titleEl.value.trim() : '';
-    var content = editorArea ? editorArea.innerHTML.trim() : '';
-    var tags    = tagsEl && tagsEl.value
-      ? tagsEl.value.split(',').map(function(t){return t.trim();}).filter(Boolean)
-      : [];
-
-    var ok = true;
-    var titleErr   = document.getElementById('admin-title-error');
-    var contentErr = document.getElementById('admin-content-error');
-    var tokenErr   = document.getElementById('admin-token-error');
-    var tokenInput = document.getElementById('admin-gh-token');
-
-    if (!title) {
-      if (titleErr) titleErr.style.display = 'block';
-      if (titleEl)  titleEl.classList.add('error');
-      ok = false;
-    } else {
-      if (titleErr) titleErr.style.display = 'none';
-      if (titleEl)  titleEl.classList.remove('error');
+      if (dest === 'blog') {
+        projFields.style.display  = 'none';
+        descField.style.display   = 'none';
+        editorField.style.display = 'block';
+      } else if (dest === 'projects') {
+        projFields.style.display  = 'block';
+        descField.style.display   = 'block';
+        editorField.style.display = 'none';
+      } else { /* both */
+        projFields.style.display  = 'block';
+        descField.style.display   = 'block';
+        editorField.style.display = 'block';
+      }
     }
 
-    if (!content || (editorArea && editorArea.textContent.trim() === '')) {
-      if (contentErr) contentErr.style.display = 'block';
-      ok = false;
-    } else {
-      if (contentErr) contentErr.style.display = 'none';
-    }
-
-    if (!token) {
-      if (tokenErr)   tokenErr.style.display = 'block';
-      if (tokenInput) tokenInput.classList.add('error');
-      ok = false;
-    } else {
-      if (tokenErr)   tokenErr.style.display = 'none';
-      if (tokenInput) tokenInput.classList.remove('error');
-    }
-
-    if (!ok) return;
-
-    publishBtn.textContent = 'Publicando...';
-    publishBtn.disabled    = true;
-    setStatus('Conectando ao GitHub...', 'info');
-
-    fetchPosts(token)
-      .then(function (data) {
-        var newPost = { id: Date.now(), title: title, content: content, tags: tags, date: new Date().toISOString() };
-        return savePosts([newPost].concat(data.posts), data.sha, token);
-      })
-      .then(function () {
-        setStatus('✅ Post publicado com sucesso!', 'success');
-        if (titleEl)  titleEl.value = '';
-        if (tagsEl)   tagsEl.value  = '';
-        if (editorArea) editorArea.innerHTML = '';
-      })
-      .catch(function () {
-        setStatus('❌ Erro ao publicar. Verifique o token.', 'error');
-        if (tokenErr)   tokenErr.style.display = 'block';
-        if (tokenInput) tokenInput.classList.add('error');
-      })
-      .finally(function () {
-        publishBtn.textContent = 'Publicar →';
-        publishBtn.disabled    = false;
+    /* ---- Editor rich text ---- */
+    var editorArea = document.getElementById('admin-post-content');
+    document.querySelectorAll('.editor-btn[data-acmd]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (editorArea) editorArea.focus();
+        var cmd = btn.dataset.acmd;
+        if      (cmd==='bold')       document.execCommand('bold');
+        else if (cmd==='italic')     document.execCommand('italic');
+        else if (cmd==='h2')         document.execCommand('formatBlock',false,'h2');
+        else if (cmd==='h3')         document.execCommand('formatBlock',false,'h3');
+        else if (cmd==='ul')         document.execCommand('insertUnorderedList');
+        else if (cmd==='blockquote') document.execCommand('formatBlock',false,'blockquote');
+        else if (cmd==='code') {
+          var sel = window.getSelection();
+          if (sel && sel.toString()) document.execCommand('insertHTML',false,'<code>'+sel.toString()+'</code>');
+        }
       });
+    });
+
+    /* ---- Limpar ---- */
+    document.getElementById('admin-clear-btn').addEventListener('click', function() {
+      if (!confirm('Limpar formulário?')) return;
+      ['admin-post-title','admin-post-tags','admin-proj-stack','admin-proj-data',
+       'admin-proj-github','admin-proj-demo','admin-proj-imagem','admin-proj-desc'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value='';
+      });
+      var dc = document.getElementById('admin-proj-destaque'); if(dc) dc.checked=false;
+      if (editorArea) editorArea.innerHTML='';
+      setAdminStatus('','');
+    });
+
+    /* ---- Status ---- */
+    function setAdminStatus(msg, type) {
+      var el = document.getElementById('admin-publish-status');
+      if (!el) return;
+      if (!msg) { el.style.display='none'; return; }
+      el.style.display='block';
+      el.className='publish-status publish-status--'+type;
+      el.textContent=msg;
+    }
+    // expõe para uso externo
+    window._setAdminStatus = setAdminStatus;
+
+    /* ---- API GitHub ---- */
+    function getToken(){ var el=document.getElementById('admin-gh-token'); return el?el.value.trim():''; }
+
+    function fetchData(token) {
+      var headers = { 'Accept':'application/vnd.github+json', 'Authorization':'Bearer '+token };
+      return fetch(API_BASE+'?ref='+BRANCH+'&t='+Date.now(), {headers:headers})
+        .then(function(r){ if(!r.ok) throw new Error('fetch'); return r.json(); })
+        .then(function(d){
+          var json = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+          return { data: JSON.parse(json), sha: d.sha };
+        });
+    }
+
+    function saveData(data, sha, token) {
+      var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+      return fetch(API_BASE, {
+        method:'PUT',
+        headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json','Accept':'application/vnd.github+json'},
+        body: JSON.stringify({message:'update: '+new Date().toISOString(), content:encoded, sha:sha, branch:BRANCH})
+      }).then(function(r){ if(!r.ok) throw new Error('save'); return r.json(); });
+    }
+
+    /* ---- Publicar ---- */
+    document.getElementById('admin-publish-btn').addEventListener('click', function() {
+      var token  = getToken();
+      var title  = document.getElementById('admin-post-title').value.trim();
+      var tagsEl = document.getElementById('admin-post-tags');
+      var tags   = tagsEl && tagsEl.value ? tagsEl.value.split(',').map(function(t){return t.trim();}).filter(Boolean) : [];
+      var content = editorArea ? editorArea.innerHTML.trim() : '';
+
+      var ok = true;
+      /* Validação token */
+      var tokenErr = document.getElementById('admin-token-error');
+      var tokenInp = document.getElementById('admin-gh-token');
+      if (!token) { tokenErr.style.display='block'; tokenInp.classList.add('error'); ok=false; }
+      else        { tokenErr.style.display='none';  tokenInp.classList.remove('error'); }
+      /* Validação título */
+      var titleErr = document.getElementById('admin-title-error');
+      var titleInp = document.getElementById('admin-post-title');
+      if (!title) { titleErr.style.display='block'; titleInp.classList.add('error'); ok=false; }
+      else        { titleErr.style.display='none';  titleInp.classList.remove('error'); }
+      /* Validação conteúdo (blog/both) */
+      var contentErr = document.getElementById('admin-content-error');
+      if ((currentDest==='blog'||currentDest==='both') && (!content || (editorArea&&editorArea.textContent.trim()===''))) {
+        contentErr.style.display='block'; ok=false;
+      } else { contentErr.style.display='none'; }
+      /* Validação descrição (proj/both) */
+      var descErr = document.getElementById('admin-desc-error');
+      var descInp = document.getElementById('admin-proj-desc');
+      if ((currentDest==='projects'||currentDest==='both') && descInp && !descInp.value.trim()) {
+        descErr.style.display='block'; ok=false;
+      } else if (descErr) { descErr.style.display='none'; }
+
+      if (!ok) return;
+
+      var publishBtn = document.getElementById('admin-publish-btn');
+      publishBtn.textContent='Publicando...'; publishBtn.disabled=true;
+      setAdminStatus('Conectando ao GitHub...','info');
+
+      fetchData(token)
+        .then(function(result) {
+          var d = result.data; var sha = result.sha;
+
+          if (currentDest==='blog'||currentDest==='both') {
+            var post = { id:Date.now(), title:title, content:content, tags:tags, date:new Date().toISOString() };
+            d.posts = [post].concat(d.posts||[]);
+          }
+
+          if (currentDest==='projects'||currentDest==='both') {
+            var stackEl = document.getElementById('admin-proj-stack');
+            var dataEl  = document.getElementById('admin-proj-data');
+            var ghEl    = document.getElementById('admin-proj-github');
+            var demoEl  = document.getElementById('admin-proj-demo');
+            var imgEl   = document.getElementById('admin-proj-imagem');
+            var destEl  = document.getElementById('admin-proj-destaque');
+            var project = {
+              id:           Date.now()+1,
+              titulo:       title,
+              descricaoCurta: descInp ? descInp.value.trim() : '',
+              stack:        stackEl && stackEl.value ? stackEl.value.split(',').map(function(s){return s.trim();}).filter(Boolean) : [],
+              data:         dataEl  ? dataEl.value.trim()  : '',
+              links: {
+                github: ghEl   && ghEl.value.trim()   ? ghEl.value.trim()   : null,
+                demo:   demoEl && demoEl.value.trim()  ? demoEl.value.trim() : null,
+              },
+              imagem:   imgEl  ? imgEl.value.trim()   || null : null,
+              tags:     tags,
+              destaque: destEl ? destEl.checked : false,
+            };
+            d.projects = [project].concat(d.projects||[]);
+          }
+
+          return saveData(d, sha, token);
+        })
+        .then(function() {
+          setAdminStatus('✅ Publicado com sucesso!','success');
+          ['admin-post-title','admin-post-tags','admin-proj-stack','admin-proj-data',
+           'admin-proj-github','admin-proj-demo','admin-proj-imagem','admin-proj-desc'].forEach(function(id){
+            var el=document.getElementById(id); if(el) el.value='';
+          });
+          var dc=document.getElementById('admin-proj-destaque'); if(dc) dc.checked=false;
+          if (editorArea) editorArea.innerHTML='';
+        })
+        .catch(function() {
+          setAdminStatus('❌ Erro ao publicar. Verifique o token.','error');
+          document.getElementById('admin-token-error').style.display='block';
+          document.getElementById('admin-gh-token').classList.add('error');
+        })
+        .finally(function() {
+          publishBtn.textContent='Publicar →'; publishBtn.disabled=false;
+        });
+    });
+  }
+
+  /* Fechar com Escape */
+  document.addEventListener('keydown', function(e) {
+    var modal=document.getElementById('admin-modal');
+    if (e.key==='Escape' && modal && modal.style.display!=='none') closeAdminModal();
   });
 
 });

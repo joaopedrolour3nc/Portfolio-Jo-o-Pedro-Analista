@@ -1595,3 +1595,185 @@ main { flex: 1; }
 
 .editor-toolbar--sm { margin-top: 0; }
 .editor-area--sm    { min-height: 160px; }
+
+/* ============================
+   BLOG POST — PÁGINA INTEIRA
+   ============================ */
+.post-page {
+  padding: 48px 0 80px;
+  min-height: calc(100vh - var(--header-h));
+}
+
+.post-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 36px;
+  transition: color var(--transition);
+}
+.post-page__back:hover { color: var(--accent); }
+
+.post-article {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.post-article__header { margin-bottom: 32px; }
+
+.post-article__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.post-article__date {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.post-article__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.post-article__divider {
+  height: 1px;
+  background: linear-gradient(to right, var(--accent), transparent);
+  margin-bottom: 32px;
+}
+
+/* Corpo do post */
+.post-article__body {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+.post-article__body h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 36px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.post-article__body h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 28px 0 10px;
+}
+.post-article__body p  { margin-bottom: 18px; }
+.post-article__body ul,
+.post-article__body ol { margin: 14px 0 18px 24px; }
+.post-article__body li { margin-bottom: 8px; }
+.post-article__body strong { color: var(--text-primary); font-weight: 600; }
+.post-article__body a  { color: var(--accent); border-bottom: 1px solid var(--accent-glow); }
+.post-article__body a:hover { color: var(--accent-light); border-color: var(--accent-light); }
+.post-article__body code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 7px;
+  color: var(--accent-light);
+}
+.post-article__body pre {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.post-article__body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.88rem;
+}
+.post-article__body blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 14px 20px;
+  margin: 20px 0;
+  background: var(--accent-glow);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-style: italic;
+}
+.post-article__body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 32px 0;
+}
+
+/* ============================
+   ADMIN — ABAS DE DESTINO
+   ============================ */
+.admin-dest-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-dest-tab {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.admin-dest-tab:hover {
+  border-color: var(--accent);
+  color: var(--accent-light);
+  background: var(--accent-glow);
+}
+.admin-dest-tab--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.admin-dest-tab--active:hover {
+  background: var(--accent-light);
+  border-color: var(--accent-light);
+  color: #fff;
+}
+
+/* Checkbox destaque */
+.admin-check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding-bottom: 4px;
+}
+.admin-check-label input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+}
