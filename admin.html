@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — João Pedro</title>
+  <script>(function(){ var t=localStorage.getItem('theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <!-- Bloqueia indexação pelos buscadores -->
+  <meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="login-screen" class="admin-login">
+    <div class="admin-login__box">
+      <span class="section__label">// admin</span>
+      <h1 class="admin-login__title">Área restrita</h1>
+      <p class="admin-login__desc">Digite a senha para acessar o painel de posts.</p>
+      <div class="form__group" style="margin-top:24px;">
+        <label class="form__label" for="login-pass">Senha</label>
+        <input class="form__input" type="password" id="login-pass" placeholder="••••••" autocomplete="current-password" />
+        <span class="form__error" id="login-error" role="alert">Senha incorreta.</span>
+      </div>
+      <button class="btn btn--primary" id="login-btn" style="width:100%;justify-content:center;margin-top:8px;">
+        Entrar →
+      </button>
+    </div>
+  </div>
+
+  <!-- PAINEL ADMIN (oculto até login) -->
+  <div id="admin-panel" style="display:none;">
+
+    <header class="header" role="banner">
+      <div class="container header__inner">
+        <a href="index.html" class="header__logo">
+          <span class="header__logo-name">João Pedro</span>
+          <span class="header__logo-role">Admin · Blog</span>
+        </a>
+        <div class="header__actions">
+          <a href="blog.html" class="btn btn--outline btn--sm">Ver blog →</a>
+          <button class="btn btn--outline btn--sm" id="logout-btn">Sair</button>
+          <button class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
+            <div class="theme-toggle__knob">🌙</div>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="container">
+
+        <div class="projects-header">
+          <span class="section__label">// novo post</span>
+          <h2 class="section__title">Escrever post</h2>
+        </div>
+
+        <!-- FORMULÁRIO DO POST -->
+        <div class="admin-form-wrap">
+          <div class="form">
+
+            <!-- Token GitHub -->
+            <div class="form__group">
+              <label class="form__label" for="gh-token">
+                Token do GitHub
+                <span style="color:var(--text-muted);font-size:0.65rem;">(não é salvo em nenhum lugar)</span>
+              </label>
+              <input class="form__input" type="password" id="gh-token"
+                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                autocomplete="off" />
+              <span class="form__error" id="token-error" role="alert">Token inválido ou sem permissão.</span>
+            </div>
+
+            <div class="form__row">
+              <!-- Título -->
+              <div class="form__group">
+                <label class="form__label" for="post-title">Título *</label>
+                <input class="form__input" type="text" id="post-title"
+                  placeholder="Título do post" />
+                <span class="form__error" id="title-error" role="alert">Informe o título.</span>
+              </div>
+              <!-- Tags -->
+              <div class="form__group">
+                <label class="form__label" for="post-tags">
+                  Tags
+                  <span style="color:var(--text-muted);font-size:0.65rem;">(separadas por vírgula)</span>
+                </label>
+                <input class="form__input" type="text" id="post-tags"
+                  placeholder="SQL, Python, Power BI" />
+              </div>
+            </div>
+
+            <!-- Editor de conteúdo -->
+            <div class="form__group">
+              <label class="form__label" for="post-content">Conteúdo *</label>
+              <!-- Barra de ferramentas do editor -->
+              <div class="editor-toolbar">
+                <button type="button" class="editor-btn" data-cmd="bold"       title="Negrito"><b>B</b></button>
+                <button type="button" class="editor-btn" data-cmd="italic"     title="Itálico"><i>I</i></button>
+                <button type="button" class="editor-btn" data-cmd="h2"         title="Título">H2</button>
+                <button type="button" class="editor-btn" data-cmd="h3"         title="Subtítulo">H3</button>
+                <button type="button" class="editor-btn" data-cmd="ul"         title="Lista">• Lista</button>
+                <button type="button" class="editor-btn" data-cmd="code"       title="Código">{'</>'}</button>
+                <button type="button" class="editor-btn" data-cmd="blockquote" title="Citação">❝</button>
+                <button type="button" class="editor-btn" data-cmd="hr"         title="Separador">—</button>
+              </div>
+              <div
+                id="post-content"
+                class="editor-area"
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+                aria-label="Conteúdo do post"
+                data-placeholder="Escreva seu post aqui..."
+              ></div>
+              <span class="form__error" id="content-error" role="alert">Escreva o conteúdo do post.</span>
+            </div>
+
+            <!-- Preview -->
+            <div class="admin-preview-toggle">
+              <button type="button" class="btn btn--outline btn--sm" id="preview-btn">👁 Pré-visualizar</button>
+            </div>
+            <div id="preview-area" class="post-preview" style="display:none;"></div>
+
+            <!-- Ações -->
+            <div class="admin-actions">
+              <button type="button" class="btn btn--outline" id="clear-btn">Limpar</button>
+              <button type="button" class="btn btn--primary" id="publish-btn">
+                Publicar post →
+              </button>
+            </div>
+
+            <!-- Feedback -->
+            <div id="publish-status" class="publish-status" style="display:none;"></div>
+
+          </div>
+        </div>
+
+        <!-- POSTS EXISTENTES -->
+        <div style="margin-top:48px;">
+          <span class="section__label">// posts publicados</span>
+          <h2 class="section__title" style="margin-bottom:24px;">Gerenciar posts</h2>
+          <div id="admin-posts-loading" class="blog-loading">
+            <div class="blog-loading__spinner"></div>
+            <span>Carregando...</span>
+          </div>
+          <div id="admin-posts-list"></div>
+        </div>
+
+        <div style="height:80px;"></div>
+      </div>
+    </main>
+
+  </div><!-- /admin-panel -->
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    /* ============================================================
+       admin.js — Painel de publicação de posts via API do GitHub
+    ============================================================ */
+
+    // ---- CONFIGURAÇÃO ----
+    var ADMIN_PASS  = '121246';
+    var REPO_OWNER  = 'joaopedrolour3nc';
+    var REPO_NAME   = 'Portfolio-Jo-o-Pedro-Analista';
+    var POSTS_FILE  = 'posts.json';
+    var BRANCH      = 'main';
+    var API_BASE    = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + POSTS_FILE;
+
+    // ---- LOGIN ----
+    var loginScreen = document.getElementById('login-screen');
+    var adminPanel  = document.getElementById('admin-panel');
+    var loginError  = document.getElementById('login-error');
+
+    function doLogin() {
+      var pass = document.getElementById('login-pass').value;
+      if (pass === ADMIN_PASS) {
+        loginScreen.style.display = 'none';
+        adminPanel.style.display  = 'block';
+        loadExistingPosts();
+      } else {
+        loginError.style.display = 'block';
+        document.getElementById('login-pass').classList.add('error');
+      }
+    }
+
+    document.getElementById('login-btn').addEventListener('click', doLogin);
+    document.getElementById('login-pass').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      loginScreen.style.display = 'flex';
+      adminPanel.style.display  = 'none';
+      document.getElementById('login-pass').value = '';
+    });
+
+    // ---- API GITHUB ----
+    function getToken() {
+      return document.getElementById('gh-token').value.trim();
+    }
+
+    function fetchPosts(token) {
+      var headers = { 'Accept': 'application/vnd.github+json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      return fetch(API_BASE + '?ref=' + BRANCH, { headers: headers })
+        .then(function(res) {
+          if (!res.ok) throw new Error('fetch_error');
+          return res.json();
+        })
+        .then(function(data) {
+          var content = atob(data.content.replace(/\n/g, ''));
+          var posts   = JSON.parse(content);
+          return { posts: posts, sha: data.sha };
+        });
+    }
+
+    function savePosts(posts, sha, token) {
+      var content = btoa(unescape(encodeURIComponent(JSON.stringify(posts, null, 2))));
+      return fetch(API_BASE, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type':  'application/json',
+          'Accept':        'application/vnd.github+json',
+        },
+        body: JSON.stringify({
+          message: 'post: ' + new Date().toISOString(),
+          content: content,
+          sha:     sha,
+          branch:  BRANCH,
+        }),
+      }).then(function(res) {
+        if (!res.ok) throw new Error('save_error');
+        return res.json();
+      });
+    }
+
+    // ---- EDITOR ----
+    var editorArea = document.getElementById('post-content');
+
+    // Placeholder via CSS + atributo
+    editorArea.addEventListener('input', function() {
+      if (editorArea.textContent.trim() === '') {
+        editorArea.innerHTML = '';
+      }
+    });
+
+    // Barra de ferramentas
+    document.querySelectorAll('.editor-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        editorArea.focus();
+        var cmd = btn.dataset.cmd;
+        if (cmd === 'bold')       document.execCommand('bold');
+        else if (cmd === 'italic') document.execCommand('italic');
+        else if (cmd === 'h2') {
+          document.execCommand('formatBlock', false, 'h2');
+        } else if (cmd === 'h3') {
+          document.execCommand('formatBlock', false, 'h3');
+        } else if (cmd === 'ul') {
+          document.execCommand('insertUnorderedList');
+        } else if (cmd === 'code') {
+          var sel = window.getSelection();
+          if (sel && sel.toString()) {
+            document.execCommand('insertHTML', false,
+              '<code>' + sel.toString() + '</code>');
+          }
+        } else if (cmd === 'blockquote') {
+          document.execCommand('formatBlock', false, 'blockquote');
+        } else if (cmd === 'hr') {
+          document.execCommand('insertHTML', false, '<hr>');
+        }
+      });
+    });
+
+    // Preview
+    document.getElementById('preview-btn').addEventListener('click', function() {
+      var area = document.getElementById('preview-area');
+      if (area.style.display === 'none') {
+        area.style.display = 'block';
+        area.innerHTML = editorArea.innerHTML || '<em style="color:var(--text-muted)">Nada para pré-visualizar.</em>';
+        this.textContent = '✕ Fechar preview';
+      } else {
+        area.style.display = 'none';
+        this.textContent = '👁 Pré-visualizar';
+      }
+    });
+
+    // Limpar
+    document.getElementById('clear-btn').addEventListener('click', function() {
+      if (confirm('Limpar o formulário?')) {
+        document.getElementById('post-title').value   = '';
+        document.getElementById('post-tags').value    = '';
+        editorArea.innerHTML = '';
+        document.getElementById('preview-area').style.display = 'none';
+        document.getElementById('preview-btn').textContent    = '👁 Pré-visualizar';
+        setStatus('', '');
+      }
+    });
+
+    // Status de publicação
+    function setStatus(msg, type) {
+      var el = document.getElementById('publish-status');
+      if (!msg) { el.style.display = 'none'; return; }
+      el.style.display = 'block';
+      el.className = 'publish-status publish-status--' + type;
+      el.textContent = msg;
+    }
+
+    // Publicar
+    document.getElementById('publish-btn').addEventListener('click', function() {
+      var token   = getToken();
+      var title   = document.getElementById('post-title').value.trim();
+      var content = editorArea.innerHTML.trim();
+      var tagsRaw = document.getElementById('post-tags').value;
+      var tags    = tagsRaw ? tagsRaw.split(',').map(function(t){ return t.trim(); }).filter(Boolean) : [];
+
+      // Validações
+      var ok = true;
+      if (!title) {
+        document.getElementById('title-error').style.display = 'block';
+        document.getElementById('post-title').classList.add('error');
+        ok = false;
+      } else {
+        document.getElementById('title-error').style.display = 'none';
+        document.getElementById('post-title').classList.remove('error');
+      }
+      if (!content || editorArea.textContent.trim() === '') {
+        document.getElementById('content-error').style.display = 'block';
+        ok = false;
+      } else {
+        document.getElementById('content-error').style.display = 'none';
+      }
+      if (!token) {
+        document.getElementById('token-error').style.display = 'block';
+        document.getElementById('gh-token').classList.add('error');
+        ok = false;
+      } else {
+        document.getElementById('token-error').style.display = 'none';
+        document.getElementById('gh-token').classList.remove('error');
+      }
+      if (!ok) return;
+
+      var publishBtn = document.getElementById('publish-btn');
+      publishBtn.textContent = 'Publicando...';
+      publishBtn.disabled    = true;
+      setStatus('Conectando ao GitHub...', 'info');
+
+      fetchPosts(token)
+        .then(function(data) {
+          var newPost = {
+            id:      Date.now(),
+            title:   title,
+            content: content,
+            tags:    tags,
+            date:    new Date().toISOString(),
+          };
+          var updatedPosts = [newPost].concat(data.posts);
+          return savePosts(updatedPosts, data.sha, token);
+        })
+        .then(function() {
+          setStatus('✅ Post publicado com sucesso!', 'success');
+          document.getElementById('post-title').value = '';
+          document.getElementById('post-tags').value  = '';
+          editorArea.innerHTML = '';
+          loadExistingPosts();
+        })
+        .catch(function(err) {
+          setStatus('❌ Erro ao publicar. Verifique o token e tente novamente.', 'error');
+          document.getElementById('token-error').style.display = 'block';
+        })
+        .finally(function() {
+          publishBtn.textContent = 'Publicar post →';
+          publishBtn.disabled    = false;
+        });
+    });
+
+    // ---- LISTA DE POSTS EXISTENTES ----
+    function formatDate(iso) {
+      var d = new Date(iso);
+      var months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    function loadExistingPosts() {
+      var loading = document.getElementById('admin-posts-loading');
+      var list    = document.getElementById('admin-posts-list');
+      loading.style.display = 'flex';
+      list.innerHTML = '';
+
+      var RAW_URL = 'https://raw.githubusercontent.com/' +
+        REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + POSTS_FILE +
+        '?nocache=' + Date.now();
+
+      fetch(RAW_URL)
+        .then(function(r) { return r.json(); })
+        .then(function(posts) {
+          loading.style.display = 'none';
+          if (!posts || posts.length === 0) {
+            list.innerHTML = '<p style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.8rem;">Nenhum post publicado ainda.</p>';
+            return;
+          }
+          posts.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+          posts.forEach(function(post) {
+            var row = document.createElement('div');
+            row.className = 'admin-post-row';
+            row.innerHTML =
+              '<div class="admin-post-row__info">' +
+                '<span class="admin-post-row__title">' + post.title + '</span>' +
+                '<span class="admin-post-row__date">' + formatDate(post.date) + '</span>' +
+              '</div>' +
+              '<button class="btn btn--outline btn--sm admin-post-row__del" data-id="' + post.id + '">Excluir</button>';
+            row.querySelector('.admin-post-row__del').addEventListener('click', function() {
+              deletePost(post.id);
+            });
+            list.appendChild(row);
+          });
+        })
+        .catch(function() {
+          loading.style.display = 'none';
+          list.innerHTML = '<p style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.8rem;">Erro ao carregar posts.</p>';
+        });
+    }
+
+    function deletePost(id) {
+      var token = getToken();
+      if (!token) {
+        alert('Informe o token do GitHub para excluir um post.');
+        return;
+      }
+      if (!confirm('Excluir este post permanentemente?')) return;
+
+      setStatus('Excluindo...', 'info');
+
+      fetchPosts(token)
+        .then(function(data) {
+          var filtered = data.posts.filter(function(p) { return p.id !== id; });
+          return savePosts(filtered, data.sha, token);
+        })
+        .then(function() {
+          setStatus('✅ Post excluído.', 'success');
+          loadExistingPosts();
+        })
+        .catch(function() {
+          setStatus('❌ Erro ao excluir. Verifique o token.', 'error');
+        });
+    }
+
+  </script>
+</body>
+</html>
