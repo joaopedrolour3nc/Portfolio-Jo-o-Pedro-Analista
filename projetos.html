@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Projetos de João Pedro — dashboards Power BI, análises SQL, pipelines Python e automações Excel." />
+  <title>Projetos — João Pedro · Analista de Dados</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%234f7cff%22/><text x=%2216%22 y=%2223%22 text-anchor=%22middle%22 font-size=%2218%22 font-family=%22monospace%22 fill=%22white%22>JP</text></svg>" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" role="banner">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo" aria-label="Ir para a Home">
+        <span class="header__logo-name">João Pedro</span>
+        <span class="header__logo-role">Analista de Dados</span>
+      </a>
+
+      <button
+        class="nav-toggle"
+        aria-label="Abrir/fechar menu"
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+
+      <nav class="nav" id="main-nav" role="navigation" aria-label="Menu principal">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="projetos.html" class="nav__link">Projetos</a>
+        <a href="contato.html" class="nav__link">Contato</a>
+      </nav>
+
+      <div class="header__actions">
+        <button
+          class="theme-toggle"
+          aria-label="Alternar tema claro/escuro"
+          title="Alternar tema"
+        >
+          <div class="theme-toggle__knob">🌙</div>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="page">
+
+    <div class="container">
+
+      <!-- Cabeçalho da página -->
+      <div class="projects-header">
+        <span class="section__label">// portfólio</span>
+        <h1 class="section__title">Projetos</h1>
+        <p class="section__desc">
+          Trabalhos desenvolvidos nas áreas de Business Intelligence, Análise de Dados, Engenharia de Dados e Automação.
+        </p>
+      </div>
+
+      <!-- Controles de filtro / busca -->
+      <div class="projects-controls" role="search" aria-label="Filtros de projetos">
+
+        <div class="projects-controls__row">
+          <!-- Busca -->
+          <label for="project-search" class="visually-hidden">Buscar projetos</label>
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+              type="search"
+              id="project-search"
+              placeholder="Buscar por título, stack…"
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- Ordenação -->
+          <label for="project-sort" class="visually-hidden">Ordenar projetos</label>
+          <select id="project-sort" class="sort-select" aria-label="Ordenar projetos">
+            <option value="recente">↓ Mais recente</option>
+            <option value="az">A → Z</option>
+          </select>
+        </div>
+
+        <!-- Filtro por tags -->
+        <div class="filter-tags">
+          <span class="filter-tags__label">Filtrar:</span>
+          <div id="filter-tags" role="group" aria-label="Filtrar por tags"></div>
+        </div>
+
+      </div>
+
+      <!-- Grid de projetos -->
+      <section
+        class="projects-grid"
+        id="projects-grid"
+        aria-label="Lista de projetos"
+        aria-live="polite"
+      ></section>
+
+      <div style="height: 80px;"></div>
+    </div>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__links">
+        <a
+          href="https://github.com/joaopedrolour3nc"
+          target="_blank"
+          rel="noopener"
+          class="footer__link"
+          aria-label="GitHub de João Pedro"
+        >GitHub</a>
+        <a
+          href="https://linkedin.com/in/joaopedrolour3nc"
+          target="_blank"
+          rel="noopener"
+          class="footer__link"
+          aria-label="LinkedIn de João Pedro"
+        >LinkedIn</a>
+      </div>
+      <p class="footer__copy">
+        © <span class="footer__year"></span> João Pedro — Analista de Dados
+      </p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/projects.js"></script>
+</body>
+</html>
