@@ -1,23 +1,4 @@
 {
   "posts": [],
-  "projects": [
-    {
-      "id": 1771844282111,
-      "titulo": "20 QUERRYS em SQL",
-      "descricaoCurta": "20 Querrys feitas em SQL abordando varias coisas",
-      "stack": [
-        "SQL"
-      ],
-      "data": "02-2026",
-      "links": {
-        "github": null,
-        "demo": null
-      },
-      "imagem": null,
-      "tags": [
-        "SQL"
-      ],
-      "destaque": true
-    }
-  ]
+  "projects": []
 }
