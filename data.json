@@ -1,4 +1,45 @@
 {
   "posts": [],
-  "projects": []
+  "projects": [
+    {
+      "id": 1771844282111,
+      "titulo": "20 QUERRYS em SQL",
+      "descricaoCurta": "20 Querrys feitas em SQL abordando varias coisas",
+      "stack": [
+        "SQL"
+      ],
+      "data": "02-2026",
+      "links": {
+        "github": null,
+        "demo": null
+      },
+      "imagem": null,
+      "tags": [
+        "SQL"
+      ],
+      "destaque": true
+    },
+    {
+      "id": 1,
+      "titulo": "Dashboard Comercial — Power BI",
+      "descricaoCurta": "Painel interativo de KPIs comerciais com análise de receita, funil de vendas e metas por regional. Conectado a banco SQL Server via DirectQuery.",
+      "stack": [
+        "Power BI",
+        "SQL Server",
+        "DAX"
+      ],
+      "data": "11-2024",
+      "links": {
+        "github": "https://github.com/joaopedrolour3nc/dashboard-comercial",
+        "demo": null
+      },
+      "imagem": "📊",
+      "tags": [
+        "Power BI",
+        "Dashboard",
+        "Vendas"
+      ],
+      "destaque": true
+    }
+  ]
 }
