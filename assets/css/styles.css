@@ -1163,7 +1163,9 @@ main { flex: 1; }
   margin-top: 5px;
   display: none;
 }
-.form__error.visible { display: block; }
+.form__error.visible  { display: block; }
+/* garante que style.display='block' inline funcione mesmo com a regra acima */
+.form__error[style*="block"] { display: block !important; }
 
 .form__row {
   display: grid;
