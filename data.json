@@ -67,29 +67,6 @@
         "Cloud"
       ],
       "destaque": false
-    },
-    {
-      "id": 4,
-      "titulo": "Automação de Relatórios Excel",
-      "descricaoCurta": "Macro VBA + script Python para geração automática de relatórios mensais: consolida 30+ planilhas, aplica fórmulas e envia por e-mail via Outlook.",
-      "stack": [
-        "Excel",
-        "VBA",
-        "Python",
-        "openpyxl"
-      ],
-      "data": "02-2024",
-      "links": {
-        "github": "https://github.com/joaopedrolour3nc/automacao-excel",
-        "demo": null
-      },
-      "imagem": "📁",
-      "tags": [
-        "Excel",
-        "Automação",
-        "Relatórios"
-      ],
-      "destaque": false
     }
   ]
 }
