@@ -362,6 +362,7 @@
       <span class="section__label">// acesso restrito</span>
       <h2 class="admin-modal__title">Publicar conteúdo</h2>
 
+      <!-- LOGIN -->
       <div id="admin-login-view">
         <div class="form__group" style="margin-top:20px;">
           <label class="form__label" for="admin-pass-input">Senha</label>
@@ -371,92 +372,153 @@
         <button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">Entrar &rarr;</button>
       </div>
 
+      <!-- PAINEL -->
       <div id="admin-panel-view" style="display:none;">
-        <div class="form__group" style="margin-top:20px;">
-          <label class="form__label" for="admin-gh-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span></label>
-          <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
-          <span class="form__error" id="admin-token-error">Token inválido ou sem permissão.</span>
+
+        <!-- Abas: Novo post / Gerenciar -->
+        <div class="admin-nav-tabs" style="margin-top:16px;">
+          <button type="button" class="admin-nav-tab admin-nav-tab--active" data-panel="publish">&#x270F;&#xFE0F; Publicar</button>
+          <button type="button" class="admin-nav-tab" data-panel="manage">&#x1F5C2; Gerenciar</button>
         </div>
 
-        <div class="form__group">
-          <label class="form__label">Publicar em</label>
-          <div class="admin-dest-tabs">
-            <button type="button" class="admin-dest-tab admin-dest-tab--active" data-dest="blog">&#x270D;&#xFE0F; Blog</button>
-            <button type="button" class="admin-dest-tab" data-dest="projects">&#x1F4C1; Projetos</button>
-            <button type="button" class="admin-dest-tab" data-dest="both">&#x2726; Ambos</button>
+        <!-- PAINEL: PUBLICAR -->
+        <div id="admin-publish-panel">
+          <div class="form__group" style="margin-top:16px;">
+            <label class="form__label" for="admin-gh-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span></label>
+            <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+            <span class="form__error" id="admin-token-error">Token inválido ou sem permissão.</span>
           </div>
-        </div>
 
-        <div class="form__group">
-          <label class="form__label" for="admin-post-title">Título *</label>
-          <input class="form__input" type="text" id="admin-post-title" placeholder="Título"/>
-          <span class="form__error" id="admin-title-error">Informe o título.</span>
-        </div>
-        <div class="form__group">
-          <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
-          <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI"/>
-        </div>
+          <div class="form__group">
+            <label class="form__label">Publicar em</label>
+            <div class="admin-dest-tabs">
+              <button type="button" class="admin-dest-tab admin-dest-tab--active" data-dest="blog">&#x270D;&#xFE0F; Blog</button>
+              <button type="button" class="admin-dest-tab" data-dest="projects">&#x1F4C1; Projetos</button>
+              <button type="button" class="admin-dest-tab" data-dest="both">&#x2726; Ambos</button>
+            </div>
+          </div>
 
-        <div id="admin-project-fields" style="display:none;">
+          <div class="form__group">
+            <label class="form__label" for="admin-post-title">Título *</label>
+            <input class="form__input" type="text" id="admin-post-title" placeholder="Título"/>
+            <span class="form__error" id="admin-title-error">Informe o título.</span>
+          </div>
+
           <div class="form__row">
             <div class="form__group">
-              <label class="form__label" for="admin-proj-stack">Stack <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
-              <input class="form__input" type="text" id="admin-proj-stack" placeholder="Python, SQL"/>
+              <label class="form__label" for="admin-post-author">Autor</label>
+              <input class="form__input" type="text" id="admin-post-author" placeholder="João Pedro" value="João Pedro"/>
             </div>
             <div class="form__group">
-              <label class="form__label" for="admin-proj-data">Data</label>
-              <input class="form__input" type="text" id="admin-proj-data" placeholder="02-2026"/>
+              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(deixe vazio = hoje)</span></label>
+              <input class="form__input" type="date" id="admin-post-date"/>
             </div>
           </div>
-          <div class="form__row">
-            <div class="form__group">
-              <label class="form__label" for="admin-proj-github">Link GitHub</label>
-              <input class="form__input" type="url" id="admin-proj-github" placeholder="https://github.com/..."/>
+
+          <div class="form__group">
+            <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
+            <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI"/>
+          </div>
+
+          <!-- Campos de projeto -->
+          <div id="admin-project-fields" style="display:none;">
+            <div class="form__row">
+              <div class="form__group">
+                <label class="form__label" for="admin-proj-stack">Stack <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
+                <input class="form__input" type="text" id="admin-proj-stack" placeholder="Python, SQL"/>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="admin-proj-data">Data do projeto</label>
+                <input class="form__input" type="text" id="admin-proj-data" placeholder="02-2026"/>
+              </div>
             </div>
-            <div class="form__group">
-              <label class="form__label" for="admin-proj-demo">Link Demo</label>
-              <input class="form__input" type="url" id="admin-proj-demo" placeholder="https://..."/>
+            <div class="form__row">
+              <div class="form__group">
+                <label class="form__label" for="admin-proj-github">Link GitHub</label>
+                <input class="form__input" type="url" id="admin-proj-github" placeholder="https://github.com/..."/>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="admin-proj-demo">Link Demo</label>
+                <input class="form__input" type="url" id="admin-proj-demo" placeholder="https://..."/>
+              </div>
+            </div>
+            <div class="form__row">
+              <div class="form__group">
+                <label class="form__label" for="admin-proj-imagem">Imagem <span style="color:var(--text-muted);font-size:0.62rem;">(emoji ou URL)</span></label>
+                <input class="form__input" type="text" id="admin-proj-imagem" placeholder="&#x1F4CA; ou https://..."/>
+              </div>
+              <div class="form__group" style="display:flex;align-items:flex-end;padding-bottom:4px;">
+                <label class="admin-check-label">
+                  <input type="checkbox" id="admin-proj-destaque"/> Marcar como destaque
+                </label>
+              </div>
             </div>
           </div>
-          <div class="form__row">
-            <div class="form__group">
-              <label class="form__label" for="admin-proj-imagem">Imagem <span style="color:var(--text-muted);font-size:0.62rem;">(emoji ou URL)</span></label>
-              <input class="form__input" type="text" id="admin-proj-imagem" placeholder="&#x1F4CA; ou https://..."/>
-            </div>
-            <div class="form__group" style="display:flex;align-items:flex-end;padding-bottom:4px;">
-              <label class="admin-check-label">
-                <input type="checkbox" id="admin-proj-destaque"/> Marcar como destaque
+
+          <!-- Imagem do post (blog) -->
+          <div id="admin-blog-image-field" class="form__group">
+            <label class="form__label">Imagem de capa <span style="color:var(--text-muted);font-size:0.62rem;">(opcional)</span></label>
+            <div class="image-upload-area">
+              <label class="image-upload-btn" for="admin-post-image-file">
+                &#x1F4C2; Escolher do computador
+                <input type="file" id="admin-post-image-file" accept="image/*" style="display:none;"/>
               </label>
+              <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.7rem;">ou</span>
+              <input class="form__input" type="url" id="admin-post-image-url" placeholder="https://url-da-imagem.com/foto.jpg" style="flex:1;min-width:0;"/>
             </div>
+            <img id="admin-image-preview" src="" alt="Preview" style="display:none;max-height:140px;border-radius:var(--radius);margin-top:10px;object-fit:cover;width:100%;border:1px solid var(--border);"/>
+            <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.62rem;margin-top:4px;display:block;">Máximo recomendado: 800KB</span>
+          </div>
+
+          <div id="admin-desc-field" class="form__group" style="display:none;">
+            <label class="form__label" for="admin-proj-desc">Descrição curta *</label>
+            <textarea class="form__textarea" id="admin-proj-desc" placeholder="Resumo do projeto..." style="min-height:80px;"></textarea>
+            <span class="form__error" id="admin-desc-error">Informe a descrição.</span>
+          </div>
+
+          <div id="admin-editor-field" class="form__group">
+            <label class="form__label">Conteúdo *</label>
+            <div class="editor-toolbar editor-toolbar--sm">
+              <button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>
+              <button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>
+              <button type="button" class="editor-btn" data-acmd="h2">H2</button>
+              <button type="button" class="editor-btn" data-acmd="h3">H3</button>
+              <button type="button" class="editor-btn" data-acmd="ul">&bull; Lista</button>
+              <button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>
+              <button type="button" class="editor-btn" data-acmd="blockquote">&#x275D;</button>
+            </div>
+            <div id="admin-post-content" class="editor-area editor-area--sm" contenteditable="true" data-placeholder="Escreva o conteúdo aqui..."></div>
+            <span class="form__error" id="admin-content-error">Escreva o conteúdo.</span>
+          </div>
+
+          <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
+
+          <div class="admin-actions">
+            <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
+            <button class="btn btn--primary" id="admin-publish-btn">Publicar &rarr;</button>
           </div>
         </div>
 
-        <div id="admin-desc-field" class="form__group" style="display:none;">
-          <label class="form__label" for="admin-proj-desc">Descrição curta *</label>
-          <textarea class="form__textarea" id="admin-proj-desc" placeholder="Resumo do projeto..." style="min-height:80px;"></textarea>
-          <span class="form__error" id="admin-desc-error">Informe a descrição.</span>
-        </div>
-
-        <div id="admin-editor-field" class="form__group">
-          <label class="form__label">Conteúdo *</label>
-          <div class="editor-toolbar editor-toolbar--sm">
-            <button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>
-            <button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>
-            <button type="button" class="editor-btn" data-acmd="h2">H2</button>
-            <button type="button" class="editor-btn" data-acmd="h3">H3</button>
-            <button type="button" class="editor-btn" data-acmd="ul">&bull; Lista</button>
-            <button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>
-            <button type="button" class="editor-btn" data-acmd="blockquote">&#x275D;</button>
+        <!-- PAINEL: GERENCIAR -->
+        <div id="admin-manage-panel" style="display:none;">
+          <div class="form__group" style="margin-top:16px;">
+            <label class="form__label" for="admin-manage-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(para excluir)</span></label>
+            <input class="form__input" type="password" id="admin-manage-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
           </div>
-          <div id="admin-post-content" class="editor-area editor-area--sm" contenteditable="true" data-placeholder="Escreva o conteúdo aqui..."></div>
-          <span class="form__error" id="admin-content-error">Escreva o conteúdo.</span>
-        </div>
 
-        <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
+          <div class="admin-manage-tabs" style="margin-top:12px;">
+            <button type="button" class="admin-dest-tab admin-dest-tab--active" data-mtab="posts">Posts</button>
+            <button type="button" class="admin-dest-tab" data-mtab="projects">Projetos</button>
+          </div>
 
-        <div class="admin-actions">
-          <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
-          <button class="btn btn--primary" id="admin-publish-btn">Publicar &rarr;</button>
+          <div id="admin-manage-list" style="margin-top:16px;">
+            <div class="blog-loading" id="admin-manage-loading" style="display:none;">
+              <div class="blog-loading__spinner"></div>
+              <span>Carregando...</span>
+            </div>
+            <div id="admin-manage-items"></div>
+          </div>
+          <div id="admin-manage-status" class="publish-status" style="display:none;margin-top:12px;"></div>
         </div>
 
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">

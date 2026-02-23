@@ -1,8 +1,7 @@
 /* ============================================================
-   main.js — Tema, menu mobile, admin modal
+   main.js
    ============================================================ */
 
-/* ---- Tema: aplica antes do render para evitar flash ---- */
 (function () {
   var t = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', t);
@@ -14,24 +13,71 @@ function updateToggleIcon(theme) {
   });
 }
 
-/* ============================================================
-   CONFIG GLOBAL
-   ============================================================ */
 var REPO_OWNER = 'joaopedrolour3nc';
 var REPO_NAME  = 'Portfolio-Jo-o-Pedro-Analista';
 var DATA_FILE  = 'data.json';
 var BRANCH     = 'main';
-var API_BASE   = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + DATA_FILE;
+var RAW_URL    = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + DATA_FILE;
+var API_URL    = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + DATA_FILE;
 var ADMIN_PASS = '121246';
+
+function gel(id) { return document.getElementById(id); }
+function gval(id) { var e = gel(id); return e ? e.value.trim() : ''; }
+
+function showEl(id, show) {
+  var e = gel(id);
+  if (e) e.style.display = show ? 'block' : 'none';
+}
+
+function setStatus(id, msg, type) {
+  var e = gel(id);
+  if (!e) return;
+  if (!msg) { e.style.display = 'none'; return; }
+  e.style.display = 'block';
+  e.className = 'publish-status publish-status--' + (type || 'info');
+  e.textContent = msg;
+}
+
+/* Lê SHA via API + conteúdo via raw */
+function ghRead(token) {
+  var sha;
+  return fetch(API_URL + '?ref=' + BRANCH + '&_=' + Date.now(), {
+    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('Token inválido (HTTP ' + r.status + ')');
+    return r.json();
+  })
+  .then(function(meta) {
+    sha = meta.sha;
+    return fetch(RAW_URL + '?_=' + Date.now());
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('Erro ao ler arquivo (HTTP ' + r.status + ')');
+    return r.json();
+  })
+  .then(function(data) { return { data: data, sha: sha }; });
+}
+
+/* Salva via API */
+function ghWrite(data, sha, token) {
+  var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  return fetch(API_URL, {
+    method: 'PUT',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+    body: JSON.stringify({ message: 'update — ' + new Date().toISOString(), content: content, sha: sha, branch: BRANCH })
+  }).then(function(r) {
+    if (!r.ok) throw new Error('Erro ao salvar (HTTP ' + r.status + ')');
+    return r.json();
+  });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  /* ---- Tema toggle ---- */
-  var savedTheme = localStorage.getItem('theme') || 'dark';
-  updateToggleIcon(savedTheme);
-
-  document.querySelectorAll('.theme-toggle').forEach(function (btn) {
-    btn.addEventListener('click', function () {
+  /* --- Tema --- */
+  updateToggleIcon(localStorage.getItem('theme') || 'dark');
+  document.querySelectorAll('.theme-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function() {
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
@@ -39,22 +85,22 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* ---- Menu mobile ---- */
+  /* --- Menu mobile --- */
   var navToggle = document.querySelector('.nav-toggle');
-  var nav       = document.querySelector('.nav');
+  var nav = document.querySelector('.nav');
   if (navToggle && nav) {
-    navToggle.addEventListener('click', function (e) {
+    navToggle.addEventListener('click', function(e) {
       e.stopPropagation();
-      var isOpen = nav.classList.toggle('open');
-      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      var open = nav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    nav.querySelectorAll('.nav__link').forEach(function (link) {
-      link.addEventListener('click', function () {
+    nav.querySelectorAll('.nav__link').forEach(function(link) {
+      link.addEventListener('click', function() {
         nav.classList.remove('open');
         navToggle.setAttribute('aria-expanded', 'false');
       });
     });
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
       if (nav.classList.contains('open') && !nav.contains(e.target)) {
         nav.classList.remove('open');
         navToggle.setAttribute('aria-expanded', 'false');
@@ -62,124 +108,104 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* ---- Link ativo no nav ---- */
-  var currentFile = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav__link').forEach(function (link) {
-    if (link.getAttribute('href') === currentFile) link.classList.add('active');
+  /* --- Link ativo --- */
+  var page = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav__link').forEach(function(l) {
+    if (l.getAttribute('href') === page) l.classList.add('active');
   });
 
-  /* ---- Copyright ---- */
-  document.querySelectorAll('.footer__year').forEach(function (el) {
+  /* --- Copyright --- */
+  document.querySelectorAll('.footer__year').forEach(function(el) {
     el.textContent = new Date().getFullYear();
   });
 
-  /* ============================================================
-     ADMIN — gatilho: 5 cliques no nome
-     ============================================================ */
-  var logoName   = document.querySelector('.header__logo-name');
-  var clickCount = 0;
-  var clickTimer = null;
+  /* === ADMIN MODAL === */
 
+  /* Gatilho: 5 cliques no nome */
+  var logoName = document.querySelector('.header__logo-name');
+  var clicks = 0, timer = null;
   if (logoName) {
     logoName.style.userSelect = 'none';
-    logoName.addEventListener('click', function (e) {
+    logoName.addEventListener('click', function(e) {
       e.preventDefault();
-      clickCount++;
-      clearTimeout(clickTimer);
-      clickTimer = setTimeout(function () { clickCount = 0; }, 2000);
-      if (clickCount >= 5) {
-        clickCount = 0;
-        openAdminModal();
-      }
+      clicks++;
+      clearTimeout(timer);
+      timer = setTimeout(function() { clicks = 0; }, 2000);
+      if (clicks >= 5) { clicks = 0; openModal(); }
     });
   }
 
-  /* ---- Helpers de modal ---- */
-  function openAdminModal() {
-    var modal = document.getElementById('admin-modal');
-    if (!modal) return;
-    modal.style.display = 'flex';
+  function openModal() {
+    var m = gel('admin-modal');
+    if (!m) return;
+    m.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    setTimeout(function () {
-      var el = document.getElementById('admin-pass-input');
-      if (el) el.focus();
-    }, 80);
+    setTimeout(function() { var el = gel('admin-pass-input'); if (el) el.focus(); }, 80);
   }
 
-  function closeAdminModal() {
-    var modal = document.getElementById('admin-modal');
-    if (!modal) return;
-    modal.style.display = 'none';
+  function closeModal() {
+    var m = gel('admin-modal');
+    if (!m) return;
+    m.style.display = 'none';
     document.body.style.overflow = '';
     showView('login');
-    var inp = document.getElementById('admin-pass-input');
+    var inp = gel('admin-pass-input');
     if (inp) { inp.value = ''; inp.classList.remove('error'); }
-    setStatus('', '');
+    setStatus('admin-publish-status', '', '');
   }
 
   function showView(which) {
-    var lv = document.getElementById('admin-login-view');
-    var pv = document.getElementById('admin-panel-view');
-    if (!lv || !pv) return;
-    lv.style.display = (which === 'login') ? 'block' : 'none';
-    pv.style.display = (which === 'panel') ? 'block' : 'none';
+    var lv = gel('admin-login-view'), pv = gel('admin-panel-view');
+    if (lv) lv.style.display = which === 'login' ? 'block' : 'none';
+    if (pv) pv.style.display = which === 'panel' ? 'block' : 'none';
   }
 
-  function showError(id, show) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.style.display = show ? 'block' : 'none';
-  }
-
-  function setStatus(msg, type) {
-    var el = document.getElementById('admin-publish-status');
-    if (!el) return;
-    if (!msg) { el.style.display = 'none'; return; }
-    el.style.display = 'block';
-    el.className = 'publish-status publish-status--' + type;
-    el.textContent = msg;
-  }
-
-  /* ---- Fechar ---- */
-  var closeBtn = document.getElementById('admin-modal-close');
-  var backdrop = document.getElementById('admin-backdrop');
-  if (closeBtn) closeBtn.addEventListener('click', closeAdminModal);
-  if (backdrop) backdrop.addEventListener('click', closeAdminModal);
-  document.addEventListener('keydown', function (e) {
-    var modal = document.getElementById('admin-modal');
-    if (e.key === 'Escape' && modal && modal.style.display !== 'none') closeAdminModal();
+  /* Fechar */
+  var closeBtn = gel('admin-modal-close'), backdrop = gel('admin-backdrop');
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (backdrop) backdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', function(e) {
+    var m = gel('admin-modal');
+    if (e.key === 'Escape' && m && m.style.display !== 'none') closeModal();
   });
 
-  /* ---- Login ---- */
+  /* Login */
   function doLogin() {
-    var inp = document.getElementById('admin-pass-input');
+    var inp = gel('admin-pass-input');
     if (!inp) return;
     if (inp.value === ADMIN_PASS) {
-      showError('admin-pass-error', false);
-      inp.classList.remove('error');
+      showEl('admin-pass-error', false); inp.classList.remove('error');
       showView('panel');
     } else {
-      showError('admin-pass-error', true);
-      inp.classList.add('error');
-      inp.value = '';
-      inp.focus();
+      showEl('admin-pass-error', true); inp.classList.add('error');
+      inp.value = ''; inp.focus();
     }
   }
-
-  var passBtn = document.getElementById('admin-pass-btn');
-  var passInp = document.getElementById('admin-pass-input');
+  var passBtn = gel('admin-pass-btn'), passInp = gel('admin-pass-input');
   if (passBtn) passBtn.addEventListener('click', doLogin);
-  if (passInp) passInp.addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+  if (passInp) passInp.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
 
-  var logoutBtn = document.getElementById('admin-logout-btn');
-  if (logoutBtn) logoutBtn.addEventListener('click', function () { showView('login'); });
+  /* Logout */
+  var logoutBtn = gel('admin-logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', function() { showView('login'); });
 
-  /* ---- Abas de destino ---- */
+  /* Abas Publicar / Gerenciar */
+  document.querySelectorAll('.admin-nav-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.admin-nav-tab').forEach(function(t) { t.classList.remove('admin-nav-tab--active'); });
+      tab.classList.add('admin-nav-tab--active');
+      var p = tab.dataset.panel;
+      showEl('admin-publish-panel', p === 'publish');
+      showEl('admin-manage-panel',  p === 'manage');
+      if (p === 'manage') loadManage('posts');
+    });
+  });
+
+  /* Abas Blog / Projetos / Ambos */
   var currentDest = 'blog';
-
-  document.querySelectorAll('.admin-dest-tab').forEach(function (tab) {
-    tab.addEventListener('click', function () {
-      document.querySelectorAll('.admin-dest-tab').forEach(function (t) { t.classList.remove('admin-dest-tab--active'); });
+  document.querySelectorAll('.admin-dest-tab[data-dest]').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.admin-dest-tab[data-dest]').forEach(function(t) { t.classList.remove('admin-dest-tab--active'); });
       tab.classList.add('admin-dest-tab--active');
       currentDest = tab.dataset.dest;
       applyDestFields(currentDest);
@@ -187,22 +213,37 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function applyDestFields(dest) {
-    var projFields  = document.getElementById('admin-project-fields');
-    var descField   = document.getElementById('admin-desc-field');
-    var editorField = document.getElementById('admin-editor-field');
-    if (!projFields || !descField || !editorField) return;
-
-    projFields.style.display  = (dest === 'projects' || dest === 'both') ? 'block' : 'none';
-    descField.style.display   = (dest === 'projects' || dest === 'both') ? 'block' : 'none';
-    editorField.style.display = (dest === 'blog'     || dest === 'both') ? 'block' : 'none';
+    showEl('admin-project-fields',   dest === 'projects' || dest === 'both');
+    showEl('admin-desc-field',       dest === 'projects' || dest === 'both');
+    showEl('admin-editor-field',     dest === 'blog'     || dest === 'both');
+    showEl('admin-blog-image-field', dest === 'blog'     || dest === 'both');
   }
 
-  /* ---- Editor rich text ---- */
-  document.querySelectorAll('.editor-btn[data-acmd]').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
+  /* Upload imagem → base64 */
+  var imageBase64 = null;
+  var imgFile = gel('admin-post-image-file'), imgPreview = gel('admin-image-preview');
+  if (imgFile) {
+    imgFile.addEventListener('change', function() {
+      var file = imgFile.files[0];
+      if (!file) { imageBase64 = null; if (imgPreview) imgPreview.style.display = 'none'; return; }
+      if (file.size > 800 * 1024) {
+        alert('Imagem muito grande (' + Math.round(file.size/1024) + 'KB). Use menos de 800KB.');
+        imgFile.value = ''; imageBase64 = null; return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        imageBase64 = ev.target.result;
+        if (imgPreview) { imgPreview.src = imageBase64; imgPreview.style.display = 'block'; }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* Editor rich text */
+  document.querySelectorAll('.editor-btn[data-acmd]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
       e.preventDefault();
-      var editor = document.getElementById('admin-post-content');
-      if (editor) editor.focus();
+      var ed = gel('admin-post-content'); if (ed) ed.focus();
       var cmd = btn.dataset.acmd;
       if      (cmd === 'bold')       document.execCommand('bold');
       else if (cmd === 'italic')     document.execCommand('italic');
@@ -217,150 +258,196 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* ---- Limpar formulário ---- */
-  var clearBtn = document.getElementById('admin-clear-btn');
+  /* Limpar */
+  var clearBtn = gel('admin-clear-btn');
   if (clearBtn) {
-    clearBtn.addEventListener('click', function () {
+    clearBtn.addEventListener('click', function() {
       if (!confirm('Limpar formulário?')) return;
-      ['admin-post-title','admin-post-tags','admin-proj-stack','admin-proj-data',
-       'admin-proj-github','admin-proj-demo','admin-proj-imagem','admin-proj-desc'].forEach(function (id) {
-        var el = document.getElementById(id);
-        if (el) el.value = '';
+      ['admin-post-title','admin-post-tags','admin-post-author','admin-post-date',
+       'admin-post-image-url','admin-proj-stack','admin-proj-data','admin-proj-github',
+       'admin-proj-demo','admin-proj-imagem','admin-proj-desc'].forEach(function(id) {
+        var el = gel(id); if (el) el.value = '';
       });
-      var dc = document.getElementById('admin-proj-destaque');
-      if (dc) dc.checked = false;
-      var editor = document.getElementById('admin-post-content');
-      if (editor) editor.innerHTML = '';
-      setStatus('', '');
+      var ae = gel('admin-post-author'); if (ae) ae.value = 'João Pedro';
+      var dc = gel('admin-proj-destaque'); if (dc) dc.checked = false;
+      var ed = gel('admin-post-content'); if (ed) ed.innerHTML = '';
+      var fi = gel('admin-post-image-file'); if (fi) fi.value = '';
+      if (imgPreview) imgPreview.style.display = 'none';
+      imageBase64 = null;
+      setStatus('admin-publish-status', '', '');
     });
   }
 
-  /* ---- API GitHub ---- */
-  function getToken() {
-    var el = document.getElementById('admin-gh-token');
-    return el ? el.value.trim() : '';
+  /* === PUBLICAR === */
+  var publishBtn = gel('admin-publish-btn');
+  if (publishBtn) {
+    publishBtn.addEventListener('click', function() {
+      var token   = gval('admin-gh-token');
+      var title   = gval('admin-post-title');
+      var edEl    = gel('admin-post-content');
+      var content = edEl ? edEl.innerHTML.trim() : '';
+      var author  = gval('admin-post-author') || 'João Pedro';
+      var tags    = gval('admin-post-tags').split(',').map(function(t){return t.trim();}).filter(Boolean);
+      var dv      = gval('admin-post-date');
+      var postDate = dv ? new Date(dv + 'T12:00:00').toISOString() : new Date().toISOString();
+      var image   = imageBase64 || gval('admin-post-image-url') || null;
+      var descInp = gel('admin-proj-desc');
+
+      var ok = true;
+      if (!token) { showEl('admin-token-error', true); ok = false; } else { showEl('admin-token-error', false); }
+      if (!title) { showEl('admin-title-error', true); ok = false; } else { showEl('admin-title-error', false); }
+      if ((currentDest === 'blog' || currentDest === 'both') && edEl && !edEl.textContent.trim()) {
+        showEl('admin-content-error', true); ok = false;
+      } else { showEl('admin-content-error', false); }
+      if ((currentDest === 'projects' || currentDest === 'both') && descInp && !descInp.value.trim()) {
+        showEl('admin-desc-error', true); ok = false;
+      } else { showEl('admin-desc-error', false); }
+      if (!ok) return;
+
+      publishBtn.disabled = true; publishBtn.textContent = 'Publicando...';
+      setStatus('admin-publish-status', 'Conectando ao GitHub...', 'info');
+
+      ghRead(token)
+        .then(function(r) {
+          var d = r.data, sha = r.sha, newId = Date.now();
+          if (currentDest === 'blog' || currentDest === 'both') {
+            d.posts = [{ id: newId, title: title, content: content, tags: tags, date: postDate, author: author, image: image }]
+              .concat(d.posts || []);
+          }
+          if (currentDest === 'projects' || currentDest === 'both') {
+            d.projects = [{
+              id: newId + 1, titulo: title,
+              descricaoCurta: descInp ? descInp.value.trim() : '',
+              stack: gval('admin-proj-stack').split(',').map(function(s){return s.trim();}).filter(Boolean),
+              data: gval('admin-proj-data'),
+              links: { github: gval('admin-proj-github') || null, demo: gval('admin-proj-demo') || null },
+              imagem: gval('admin-proj-imagem') || null,
+              tags: tags,
+              destaque: gel('admin-proj-destaque') ? gel('admin-proj-destaque').checked : false
+            }].concat(d.projects || []);
+          }
+          return ghWrite(d, sha, token);
+        })
+        .then(function() {
+          setStatus('admin-publish-status', '✅ Publicado com sucesso!', 'success');
+          ['admin-post-title','admin-post-tags','admin-post-date','admin-post-image-url',
+           'admin-proj-stack','admin-proj-data','admin-proj-github','admin-proj-demo',
+           'admin-proj-imagem','admin-proj-desc'].forEach(function(id) { var el = gel(id); if (el) el.value = ''; });
+          var ae = gel('admin-post-author'); if (ae) ae.value = 'João Pedro';
+          var dc = gel('admin-proj-destaque'); if (dc) dc.checked = false;
+          var ed2 = gel('admin-post-content'); if (ed2) ed2.innerHTML = '';
+          var fi = gel('admin-post-image-file'); if (fi) fi.value = '';
+          if (imgPreview) imgPreview.style.display = 'none';
+          imageBase64 = null;
+        })
+        .catch(function(err) { setStatus('admin-publish-status', '❌ ' + (err.message || 'Erro'), 'error'); })
+        .finally(function() { publishBtn.disabled = false; publishBtn.textContent = 'Publicar →'; });
+    });
   }
 
-  function fetchData(token) {
-    return fetch(API_BASE + '?ref=' + BRANCH + '&t=' + Date.now(), {
-      headers: { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + token }
-    })
-      .then(function (r) { if (!r.ok) throw new Error('fetch'); return r.json(); })
-      .then(function (d) {
-        var json = decodeURIComponent(escape(atob(d.content.replace(/\n/g, ''))));
-        return { data: JSON.parse(json), sha: d.sha };
+  /* === GERENCIAR === */
+  var currentMTab = 'posts';
+
+  function loadManage(type) {
+    var loading = gel('admin-manage-loading'), items = gel('admin-manage-items');
+    if (!items) return;
+    if (loading) loading.style.display = 'flex';
+    items.innerHTML = '';
+    setStatus('admin-manage-status', '', '');
+
+    fetch(RAW_URL + '?_=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (loading) loading.style.display = 'none';
+        var list = type === 'posts' ? (data.posts || []) : (data.projects || []);
+        if (!list.length) {
+          items.innerHTML = '<p style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.78rem;padding:12px 0;">Nenhum item.</p>';
+          return;
+        }
+        list.forEach(function(item) {
+          var label  = type === 'posts' ? item.title : item.titulo;
+          var date   = type === 'posts' ? new Date(item.date).toLocaleDateString('pt-BR') : (item.data || '');
+          var itemId = String(item.id);
+          var row = document.createElement('div');
+          row.className = 'admin-post-row';
+          row.innerHTML =
+            '<div class="admin-post-row__info">' +
+              '<span class="admin-post-row__title">' + (label || '(sem título)') + '</span>' +
+              '<span class="admin-post-row__date">' + date + '</span>' +
+            '</div>' +
+            '<button class="btn btn--outline btn--sm admin-post-row__del" style="color:var(--error);border-color:var(--error);">Excluir</button>';
+          /* IIFE para fechar corretamente o itemId e type */
+          (function(tid, ttype) {
+            row.querySelector('.admin-post-row__del').addEventListener('click', function() {
+              doDelete(ttype, tid);
+            });
+          })(itemId, type);
+          items.appendChild(row);
+        });
+      })
+      .catch(function() {
+        if (loading) loading.style.display = 'none';
+        items.innerHTML = '<p style="color:var(--error);font-family:var(--font-mono);font-size:0.78rem;">Erro ao carregar.</p>';
       });
   }
 
-  function saveData(data, sha, token) {
-    var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-    return fetch(API_BASE, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github+json'
-      },
-      body: JSON.stringify({ message: 'update: ' + new Date().toISOString(), content: encoded, sha: sha, branch: BRANCH })
-    }).then(function (r) { if (!r.ok) throw new Error('save'); return r.json(); });
-  }
+  document.querySelectorAll('.admin-dest-tab[data-mtab]').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.admin-dest-tab[data-mtab]').forEach(function(t) { t.classList.remove('admin-dest-tab--active'); });
+      tab.classList.add('admin-dest-tab--active');
+      currentMTab = tab.dataset.mtab;
+      loadManage(currentMTab);
+    });
+  });
 
-  /* ---- Publicar ---- */
-  var publishBtn = document.getElementById('admin-publish-btn');
-  if (publishBtn) {
-    publishBtn.addEventListener('click', function () {
-      var token   = getToken();
-      var titleEl = document.getElementById('admin-post-title');
-      var tagsEl  = document.getElementById('admin-post-tags');
-      var editor  = document.getElementById('admin-post-content');
-      var descInp = document.getElementById('admin-proj-desc');
+  function doDelete(type, id) {
+    var token = gval('admin-manage-token');
+    if (!token) { setStatus('admin-manage-status', '⚠️ Informe o token para excluir.', 'error'); return; }
+    if (!confirm('Excluir permanentemente?')) return;
 
-      var title   = titleEl ? titleEl.value.trim() : '';
-      var content = editor  ? editor.innerHTML.trim() : '';
-      var tags    = tagsEl && tagsEl.value
-        ? tagsEl.value.split(',').map(function (t) { return t.trim(); }).filter(Boolean)
-        : [];
+    setStatus('admin-manage-status', '🔄 Buscando SHA...', 'info');
 
-      var ok = true;
-
-      if (!token) { showError('admin-token-error', true); document.getElementById('admin-gh-token').classList.add('error'); ok = false; }
-      else        { showError('admin-token-error', false); document.getElementById('admin-gh-token').classList.remove('error'); }
-
-      if (!title) { showError('admin-title-error', true); titleEl.classList.add('error'); ok = false; }
-      else        { showError('admin-title-error', false); if (titleEl) titleEl.classList.remove('error'); }
-
-      if ((currentDest === 'blog' || currentDest === 'both') && (!content || (editor && editor.textContent.trim() === ''))) {
-        showError('admin-content-error', true); ok = false;
-      } else { showError('admin-content-error', false); }
-
-      if ((currentDest === 'projects' || currentDest === 'both') && descInp && !descInp.value.trim()) {
-        showError('admin-desc-error', true); ok = false;
-      } else { showError('admin-desc-error', false); }
-
-      if (!ok) return;
-
-      publishBtn.textContent = 'Publicando...';
-      publishBtn.disabled    = true;
-      setStatus('Conectando ao GitHub...', 'info');
-
-      fetchData(token)
-        .then(function (result) {
-          var d   = result.data;
-          var sha = result.sha;
-
-          if (currentDest === 'blog' || currentDest === 'both') {
-            var post = { id: Date.now(), title: title, content: content, tags: tags, date: new Date().toISOString() };
-            d.posts = [post].concat(d.posts || []);
+    /* Passo 1: SHA via API */
+    fetch(API_URL + '?ref=' + BRANCH + '&_=' + Date.now(), {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    })
+    .then(function(r) {
+      if (!r.ok) throw new Error('Token inválido (HTTP ' + r.status + ')');
+      return r.json();
+    })
+    .then(function(meta) {
+      var sha = meta.sha;
+      setStatus('admin-manage-status', '🔄 Lendo dados...', 'info');
+      /* Passo 2: conteúdo via raw */
+      return fetch(RAW_URL + '?_=' + Date.now())
+        .then(function(r) {
+          if (!r.ok) throw new Error('Erro ao ler arquivo (HTTP ' + r.status + ')');
+          return r.json();
+        })
+        .then(function(data) {
+          /* Passo 3: filtra — compara como string */
+          var before, after;
+          if (type === 'posts') {
+            before = (data.posts || []).length;
+            data.posts = (data.posts || []).filter(function(p) { return String(p.id) !== id; });
+            after = data.posts.length;
+          } else {
+            before = (data.projects || []).length;
+            data.projects = (data.projects || []).filter(function(p) { return String(p.id) !== id; });
+            after = data.projects.length;
           }
-
-          if (currentDest === 'projects' || currentDest === 'both') {
-            var stackEl = document.getElementById('admin-proj-stack');
-            var dataEl  = document.getElementById('admin-proj-data');
-            var ghEl    = document.getElementById('admin-proj-github');
-            var demoEl  = document.getElementById('admin-proj-demo');
-            var imgEl   = document.getElementById('admin-proj-imagem');
-            var destEl  = document.getElementById('admin-proj-destaque');
-            var project = {
-              id:             Date.now() + 1,
-              titulo:         title,
-              descricaoCurta: descInp ? descInp.value.trim() : '',
-              stack:          stackEl && stackEl.value ? stackEl.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean) : [],
-              data:           dataEl ? dataEl.value.trim() : '',
-              links: {
-                github: ghEl   && ghEl.value.trim()  ? ghEl.value.trim()  : null,
-                demo:   demoEl && demoEl.value.trim() ? demoEl.value.trim() : null
-              },
-              imagem:   imgEl  ? (imgEl.value.trim()  || null) : null,
-              tags:     tags,
-              destaque: destEl ? destEl.checked : false
-            };
-            d.projects = [project].concat(d.projects || []);
-          }
-
-          return saveData(d, sha, token);
-        })
-        .then(function () {
-          setStatus('✅ Publicado com sucesso!', 'success');
-          ['admin-post-title','admin-post-tags','admin-proj-stack','admin-proj-data',
-           'admin-proj-github','admin-proj-demo','admin-proj-imagem','admin-proj-desc'].forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.value = '';
-          });
-          var dc = document.getElementById('admin-proj-destaque');
-          if (dc) dc.checked = false;
-          var ed = document.getElementById('admin-post-content');
-          if (ed) ed.innerHTML = '';
-        })
-        .catch(function () {
-          setStatus('❌ Erro ao publicar. Verifique o token.', 'error');
-          showError('admin-token-error', true);
-          var ti = document.getElementById('admin-gh-token');
-          if (ti) ti.classList.add('error');
-        })
-        .finally(function () {
-          publishBtn.textContent = 'Publicar →';
-          publishBtn.disabled    = false;
+          if (before === after) throw new Error('Item não encontrado (id=' + id + '). Recarregue a lista.');
+          setStatus('admin-manage-status', '🔄 Salvando...', 'info');
+          /* Passo 4: salva */
+          return ghWrite(data, sha, token);
         });
+    })
+    .then(function() {
+      setStatus('admin-manage-status', '✅ Excluído com sucesso!', 'success');
+      loadManage(type);
+    })
+    .catch(function(err) {
+      setStatus('admin-manage-status', '❌ ' + (err.message || 'Erro desconhecido'), 'error');
     });
   }
 
