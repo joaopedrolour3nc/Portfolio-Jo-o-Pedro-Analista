@@ -1,48 +1,106 @@
 {
-  "posts": [],
+  "posts": [
+    {
+      "id": 1771811966260,
+      "title": "Seja Bem Vindo ao meu Blog do Meu Portfólio",
+      "content": "Estou fazendo um teste do post por aqui mesmo",
+      "tags": [
+        "Html",
+        "CSS",
+        "JavaScript"
+      ],
+      "date": "2026-02-23T01:59:26.260Z"
+    }
+  ],
   "projects": [
     {
       "id": 1,
       "titulo": "Dashboard Comercial — Power BI",
       "descricaoCurta": "Painel interativo de KPIs comerciais com análise de receita, funil de vendas e metas por regional. Conectado a banco SQL Server via DirectQuery.",
-      "stack": ["Power BI", "SQL Server", "DAX"],
+      "stack": [
+        "Power BI",
+        "SQL Server",
+        "DAX"
+      ],
       "data": "11-2024",
-      "links": { "github": "https://github.com/joaopedrolour3nc/dashboard-comercial", "demo": null },
+      "links": {
+        "github": "https://github.com/joaopedrolour3nc/dashboard-comercial",
+        "demo": null
+      },
       "imagem": "📊",
-      "tags": ["Power BI", "Dashboard", "Vendas"],
+      "tags": [
+        "Power BI",
+        "Dashboard",
+        "Vendas"
+      ],
       "destaque": true
     },
     {
       "id": 2,
       "titulo": "Análise de Churn com SQL",
       "descricaoCurta": "Estudo completo de churn de clientes em base PostgreSQL: cohort analysis, segmentação RFM e identificação de padrões de cancelamento.",
-      "stack": ["PostgreSQL", "SQL", "DBeaver"],
+      "stack": [
+        "PostgreSQL",
+        "SQL",
+        "DBeaver"
+      ],
       "data": "08-2024",
-      "links": { "github": "https://github.com/joaopedrolour3nc/analise-churn-sql", "demo": null },
+      "links": {
+        "github": "https://github.com/joaopedrolour3nc/analise-churn-sql",
+        "demo": null
+      },
       "imagem": "🔍",
-      "tags": ["SQL", "Análise", "CRM"],
+      "tags": [
+        "SQL",
+        "Análise",
+        "CRM"
+      ],
       "destaque": true
     },
     {
       "id": 3,
       "titulo": "Pipeline ETL — API → Data Warehouse",
       "descricaoCurta": "Pipeline de dados em Python que extrai dados de APIs REST, transforma com Pandas e carrega em BigQuery. Agendado via Cloud Scheduler.",
-      "stack": ["Python", "Pandas", "BigQuery", "GCP"],
+      "stack": [
+        "Python",
+        "Pandas",
+        "BigQuery",
+        "GCP"
+      ],
       "data": "05-2024",
-      "links": { "github": "https://github.com/joaopedrolour3nc/pipeline-etl-bq", "demo": null },
+      "links": {
+        "github": "https://github.com/joaopedrolour3nc/pipeline-etl-bq",
+        "demo": null
+      },
       "imagem": "⚙️",
-      "tags": ["ETL", "Python", "Cloud"],
+      "tags": [
+        "ETL",
+        "Python",
+        "Cloud"
+      ],
       "destaque": false
     },
     {
       "id": 4,
       "titulo": "Automação de Relatórios Excel",
       "descricaoCurta": "Macro VBA + script Python para geração automática de relatórios mensais: consolida 30+ planilhas, aplica fórmulas e envia por e-mail via Outlook.",
-      "stack": ["Excel", "VBA", "Python", "openpyxl"],
+      "stack": [
+        "Excel",
+        "VBA",
+        "Python",
+        "openpyxl"
+      ],
       "data": "02-2024",
-      "links": { "github": "https://github.com/joaopedrolour3nc/automacao-excel", "demo": null },
+      "links": {
+        "github": "https://github.com/joaopedrolour3nc/automacao-excel",
+        "demo": null
+      },
       "imagem": "📁",
-      "tags": ["Excel", "Automação", "Relatórios"],
+      "tags": [
+        "Excel",
+        "Automação",
+        "Relatórios"
+      ],
       "destaque": false
     }
   ]
