@@ -18,28 +18,6 @@
         "SQL"
       ],
       "destaque": true
-    },
-    {
-      "id": 1,
-      "titulo": "Dashboard Comercial — Power BI",
-      "descricaoCurta": "Painel interativo de KPIs comerciais com análise de receita, funil de vendas e metas por regional. Conectado a banco SQL Server via DirectQuery.",
-      "stack": [
-        "Power BI",
-        "SQL Server",
-        "DAX"
-      ],
-      "data": "11-2024",
-      "links": {
-        "github": "https://github.com/joaopedrolour3nc/dashboard-comercial",
-        "demo": null
-      },
-      "imagem": "📊",
-      "tags": [
-        "Power BI",
-        "Dashboard",
-        "Vendas"
-      ],
-      "destaque": true
     }
   ]
 }
