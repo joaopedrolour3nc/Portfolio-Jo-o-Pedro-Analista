@@ -1,18 +1,5 @@
 {
-  "posts": [
-    {
-      "id": 1771813937290,
-      "title": "Teste de Post",
-      "content": "OPAAA",
-      "tags": [
-        "HTML",
-        "CSS"
-      ],
-      "date": "2026-02-22T15:00:00.000Z",
-      "author": "João Pedro",
-      "image": null
-    }
-  ],
+  "posts": [],
   "projects": [
     {
       "id": 1,
@@ -57,29 +44,6 @@
         "CRM"
       ],
       "destaque": true
-    },
-    {
-      "id": 3,
-      "titulo": "Pipeline ETL — API → Data Warehouse",
-      "descricaoCurta": "Pipeline de dados em Python que extrai dados de APIs REST, transforma com Pandas e carrega em BigQuery. Agendado via Cloud Scheduler.",
-      "stack": [
-        "Python",
-        "Pandas",
-        "BigQuery",
-        "GCP"
-      ],
-      "data": "05-2024",
-      "links": {
-        "github": "https://github.com/joaopedrolour3nc/pipeline-etl-bq",
-        "demo": null
-      },
-      "imagem": "⚙️",
-      "tags": [
-        "ETL",
-        "Python",
-        "Cloud"
-      ],
-      "destaque": false
     }
   ]
 }
