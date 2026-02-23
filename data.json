@@ -1,18 +1,6 @@
 {
   "posts": [
     {
-      "id": 1771813289386,
-      "title": "TESTE de POst mo Blog",
-      "content": "Testei",
-      "tags": [
-        "Html",
-        "CSS"
-      ],
-      "date": "2026-02-22T15:00:00.000Z",
-      "author": "João Pedro",
-      "image": null
-    },
-    {
       "id": 1771813099572,
       "title": "Teste de Post",
       "content": "TReste",
