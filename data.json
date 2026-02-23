@@ -22,28 +22,6 @@
         "Vendas"
       ],
       "destaque": true
-    },
-    {
-      "id": 2,
-      "titulo": "Análise de Churn com SQL",
-      "descricaoCurta": "Estudo completo de churn de clientes em base PostgreSQL: cohort analysis, segmentação RFM e identificação de padrões de cancelamento.",
-      "stack": [
-        "PostgreSQL",
-        "SQL",
-        "DBeaver"
-      ],
-      "data": "08-2024",
-      "links": {
-        "github": "https://github.com/joaopedrolour3nc/analise-churn-sql",
-        "demo": null
-      },
-      "imagem": "🔍",
-      "tags": [
-        "SQL",
-        "Análise",
-        "CRM"
-      ],
-      "destaque": true
     }
   ]
 }
