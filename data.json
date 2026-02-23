@@ -1,17 +1,5 @@
 {
-  "posts": [
-    {
-      "id": 1771811966260,
-      "title": "Seja Bem Vindo ao meu Blog do Meu Portfólio",
-      "content": "Estou fazendo um teste do post por aqui mesmo",
-      "tags": [
-        "Html",
-        "CSS",
-        "JavaScript"
-      ],
-      "date": "2026-02-23T01:59:26.260Z"
-    }
-  ],
+  "posts": [],
   "projects": [
     {
       "id": 1,
