@@ -1,17 +1,5 @@
 {
-  "posts": [
-    {
-      "id": 1771813099572,
-      "title": "Teste de Post",
-      "content": "TReste",
-      "tags": [
-        "SQL"
-      ],
-      "date": "2026-02-22T15:00:00.000Z",
-      "author": "João Pedro",
-      "image": null
-    }
-  ],
+  "posts": [],
   "projects": [
     {
       "id": 1,
