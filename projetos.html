@@ -148,63 +148,6 @@
     </div>
   </footer>
 
-  <script src="assets/js/main.js"></script>
-  <script src="assets/js/projects.js"></script>
-      <!-- Painel pós-login -->
-      <div id="admin-panel-view" style="display:none;">
-
-        <div class="form__group" style="margin-top:20px;">
-          <label class="form__label" for="admin-gh-token">
-            Token do GitHub
-            <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span>
-          </label>
-          <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-          <span class="form__error" id="admin-token-error" role="alert">Token inválido ou sem permissão.</span>
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-title">Título *</label>
-          <input class="form__input" type="text" id="admin-post-title" placeholder="Título do post" />
-          <span class="form__error" id="admin-title-error" role="alert">Informe o título.</span>
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
-          <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI" />
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-content">Conteúdo *</label>
-          <div class="editor-toolbar editor-toolbar--sm">
-            <button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>
-            <button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>
-            <button type="button" class="editor-btn" data-acmd="h2">H2</button>
-            <button type="button" class="editor-btn" data-acmd="h3">H3</button>
-            <button type="button" class="editor-btn" data-acmd="ul">• Lista</button>
-            <button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>
-            <button type="button" class="editor-btn" data-acmd="blockquote">❝</button>
-          </div>
-          <div id="admin-post-content" class="editor-area editor-area--sm"
-            contenteditable="true" data-placeholder="Escreva o post aqui..."></div>
-          <span class="form__error" id="admin-content-error" role="alert">Escreva o conteúdo.</span>
-        </div>
-
-        <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
-
-        <div class="admin-actions">
-          <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
-          <button class="btn btn--primary" id="admin-publish-btn">Publicar →</button>
-        </div>
-
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-          <a href="blog.html" class="btn btn--outline btn--sm">Ver blog →</a>
-          <button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
   <!-- ===== ADMIN MODAL ===== -->
   <div id="admin-modal" class="admin-modal" role="dialog" aria-modal="true" style="display:none;">
     <div class="admin-modal__backdrop" id="admin-backdrop"></div>
@@ -213,7 +156,6 @@
       <span class="section__label">// acesso restrito</span>
       <h2 class="admin-modal__title">Publicar conteúdo</h2>
 
-      <!-- LOGIN -->
       <div id="admin-login-view">
         <div class="form__group" style="margin-top:20px;">
           <label class="form__label" for="admin-pass-input">Senha</label>
@@ -223,20 +165,15 @@
         <button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">Entrar &rarr;</button>
       </div>
 
-      <!-- PAINEL -->
       <div id="admin-panel-view" style="display:none;">
 
-        <!-- Abas: Novo post / Gerenciar -->
         <div class="admin-nav-tabs" style="margin-top:16px;">
           <button type="button" class="admin-nav-tab admin-nav-tab--active" data-panel="publish">&#x270F;&#xFE0F; Publicar</button>
           <button type="button" class="admin-nav-tab" data-panel="manage">&#x1F5C2; Gerenciar</button>
         </div>
 
-        <!-- PAINEL: PUBLICAR -->
         <div id="admin-publish-panel">
-
-
-          <div class="form__group">
+          <div class="form__group" style="margin-top:12px;">
             <label class="form__label">Publicar em</label>
             <div class="admin-dest-tabs">
               <button type="button" class="admin-dest-tab admin-dest-tab--active" data-dest="blog">&#x270D;&#xFE0F; Blog</button>
@@ -257,7 +194,7 @@
               <input class="form__input" type="text" id="admin-post-author" placeholder="João Pedro" value="João Pedro"/>
             </div>
             <div class="form__group">
-              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(deixe vazio = hoje)</span></label>
+              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(vazio = hoje)</span></label>
               <input class="form__input" type="date" id="admin-post-date"/>
             </div>
           </div>
@@ -267,7 +204,6 @@
             <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI"/>
           </div>
 
-          <!-- Campos de projeto -->
           <div id="admin-project-fields" style="display:none;">
             <div class="form__row">
               <div class="form__group">
@@ -302,7 +238,6 @@
             </div>
           </div>
 
-          <!-- Imagem do post (blog) -->
           <div id="admin-blog-image-field" class="form__group">
             <label class="form__label">Imagem de capa <span style="color:var(--text-muted);font-size:0.62rem;">(opcional)</span></label>
             <div class="image-upload-area">
@@ -346,15 +281,11 @@
           </div>
         </div>
 
-        <!-- PAINEL: GERENCIAR -->
         <div id="admin-manage-panel" style="display:none;">
-
-
           <div class="admin-manage-tabs" style="margin-top:12px;">
             <button type="button" class="admin-dest-tab admin-dest-tab--active" data-mtab="posts">Posts</button>
             <button type="button" class="admin-dest-tab" data-mtab="projects">Projetos</button>
           </div>
-
           <div id="admin-manage-list" style="margin-top:16px;">
             <div class="blog-loading" id="admin-manage-loading" style="display:none;">
               <div class="blog-loading__spinner"></div>
