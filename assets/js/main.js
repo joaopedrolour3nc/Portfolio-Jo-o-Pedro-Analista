@@ -13,13 +13,8 @@ function updateToggleIcon(theme) {
   });
 }
 
-var REPO_OWNER = 'joaopedrolour3nc';
-var REPO_NAME  = 'Portfolio-Jo-o-Pedro-Analista';
-var DATA_FILE  = 'data.json';
-var BRANCH     = 'main';
-var RAW_URL    = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + DATA_FILE;
-var API_URL    = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + DATA_FILE;
 var ADMIN_PASS = '121246';
+var API_PROXY  = '/api/github'; // Vercel Function
 
 function gel(id) { return document.getElementById(id); }
 function gval(id) { var e = gel(id); return e ? e.value.trim() : ''; }
@@ -38,36 +33,23 @@ function setStatus(id, msg, type) {
   e.textContent = msg;
 }
 
-/* Lê SHA via API + conteúdo via raw */
-function ghRead(token) {
-  var sha;
-  return fetch(API_URL + '?ref=' + BRANCH + '&_=' + Date.now(), {
-    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
-  })
-  .then(function(r) {
-    if (!r.ok) throw new Error('Token inválido (HTTP ' + r.status + ')');
-    return r.json();
-  })
-  .then(function(meta) {
-    sha = meta.sha;
-    return fetch(RAW_URL + '?_=' + Date.now());
-  })
-  .then(function(r) {
-    if (!r.ok) throw new Error('Erro ao ler arquivo (HTTP ' + r.status + ')');
-    return r.json();
-  })
-  .then(function(data) { return { data: data, sha: sha }; });
+/* Lê SHA + dados via Vercel Function */
+function ghRead() {
+  return fetch(API_PROXY + '?_=' + Date.now())
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(e) { throw new Error(e.error || 'Erro ao ler'); });
+      return r.json();
+    });
 }
 
-/* Salva via API */
-function ghWrite(data, sha, token) {
-  var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-  return fetch(API_URL, {
+/* Salva dados via Vercel Function */
+function ghWrite(data, sha) {
+  return fetch(API_PROXY, {
     method: 'PUT',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
-    body: JSON.stringify({ message: 'update — ' + new Date().toISOString(), content: content, sha: sha, branch: BRANCH })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: data, sha: sha })
   }).then(function(r) {
-    if (!r.ok) throw new Error('Erro ao salvar (HTTP ' + r.status + ')');
+    if (!r.ok) return r.json().then(function(e) { throw new Error(e.error || 'Erro ao salvar'); });
     return r.json();
   });
 }
@@ -169,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === 'Escape' && m && m.style.display !== 'none') closeModal();
   });
 
-  /* Login */
+  /* Login — só senha, sem token */
   function doLogin() {
     var inp = gel('admin-pass-input');
     if (!inp) return;
@@ -282,7 +264,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var publishBtn = gel('admin-publish-btn');
   if (publishBtn) {
     publishBtn.addEventListener('click', function() {
-      var token   = gval('admin-gh-token');
       var title   = gval('admin-post-title');
       var edEl    = gel('admin-post-content');
       var content = edEl ? edEl.innerHTML.trim() : '';
@@ -294,7 +275,6 @@ document.addEventListener('DOMContentLoaded', function () {
       var descInp = gel('admin-proj-desc');
 
       var ok = true;
-      if (!token) { showEl('admin-token-error', true); ok = false; } else { showEl('admin-token-error', false); }
       if (!title) { showEl('admin-title-error', true); ok = false; } else { showEl('admin-title-error', false); }
       if ((currentDest === 'blog' || currentDest === 'both') && edEl && !edEl.textContent.trim()) {
         showEl('admin-content-error', true); ok = false;
@@ -305,9 +285,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!ok) return;
 
       publishBtn.disabled = true; publishBtn.textContent = 'Publicando...';
-      setStatus('admin-publish-status', 'Conectando ao GitHub...', 'info');
+      setStatus('admin-publish-status', 'Conectando...', 'info');
 
-      ghRead(token)
+      ghRead()
         .then(function(r) {
           var d = r.data, sha = r.sha, newId = Date.now();
           if (currentDest === 'blog' || currentDest === 'both') {
@@ -326,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
               destaque: gel('admin-proj-destaque') ? gel('admin-proj-destaque').checked : false
             }].concat(d.projects || []);
           }
-          return ghWrite(d, sha, token);
+          return ghWrite(d, sha);
         })
         .then(function() {
           setStatus('admin-publish-status', '✅ Publicado com sucesso!', 'success');
@@ -355,11 +335,10 @@ document.addEventListener('DOMContentLoaded', function () {
     items.innerHTML = '';
     setStatus('admin-manage-status', '', '');
 
-    fetch(RAW_URL + '?_=' + Date.now())
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
+    ghRead()
+      .then(function(r) {
         if (loading) loading.style.display = 'none';
-        var list = type === 'posts' ? (data.posts || []) : (data.projects || []);
+        var list = type === 'posts' ? (r.data.posts || []) : (r.data.projects || []);
         if (!list.length) {
           items.innerHTML = '<p style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.78rem;padding:12px 0;">Nenhum item.</p>';
           return;
@@ -376,7 +355,6 @@ document.addEventListener('DOMContentLoaded', function () {
               '<span class="admin-post-row__date">' + date + '</span>' +
             '</div>' +
             '<button class="btn btn--outline btn--sm admin-post-row__del" style="color:var(--error);border-color:var(--error);">Excluir</button>';
-          /* IIFE para fechar corretamente o itemId e type */
           (function(tid, ttype) {
             row.querySelector('.admin-post-row__del').addEventListener('click', function() {
               doDelete(ttype, tid);
@@ -401,54 +379,32 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function doDelete(type, id) {
-    var token = gval('admin-manage-token');
-    if (!token) { setStatus('admin-manage-status', '⚠️ Informe o token para excluir.', 'error'); return; }
     if (!confirm('Excluir permanentemente?')) return;
+    setStatus('admin-manage-status', '🔄 Excluindo...', 'info');
 
-    setStatus('admin-manage-status', '🔄 Buscando SHA...', 'info');
-
-    /* Passo 1: SHA via API */
-    fetch(API_URL + '?ref=' + BRANCH + '&_=' + Date.now(), {
-      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
-    })
-    .then(function(r) {
-      if (!r.ok) throw new Error('Token inválido (HTTP ' + r.status + ')');
-      return r.json();
-    })
-    .then(function(meta) {
-      var sha = meta.sha;
-      setStatus('admin-manage-status', '🔄 Lendo dados...', 'info');
-      /* Passo 2: conteúdo via raw */
-      return fetch(RAW_URL + '?_=' + Date.now())
-        .then(function(r) {
-          if (!r.ok) throw new Error('Erro ao ler arquivo (HTTP ' + r.status + ')');
-          return r.json();
-        })
-        .then(function(data) {
-          /* Passo 3: filtra — compara como string */
-          var before, after;
-          if (type === 'posts') {
-            before = (data.posts || []).length;
-            data.posts = (data.posts || []).filter(function(p) { return String(p.id) !== id; });
-            after = data.posts.length;
-          } else {
-            before = (data.projects || []).length;
-            data.projects = (data.projects || []).filter(function(p) { return String(p.id) !== id; });
-            after = data.projects.length;
-          }
-          if (before === after) throw new Error('Item não encontrado (id=' + id + '). Recarregue a lista.');
-          setStatus('admin-manage-status', '🔄 Salvando...', 'info');
-          /* Passo 4: salva */
-          return ghWrite(data, sha, token);
-        });
-    })
-    .then(function() {
-      setStatus('admin-manage-status', '✅ Excluído com sucesso!', 'success');
-      loadManage(type);
-    })
-    .catch(function(err) {
-      setStatus('admin-manage-status', '❌ ' + (err.message || 'Erro desconhecido'), 'error');
-    });
+    ghRead()
+      .then(function(r) {
+        var d = r.data, sha = r.sha;
+        var before, after;
+        if (type === 'posts') {
+          before = (d.posts || []).length;
+          d.posts = (d.posts || []).filter(function(p) { return String(p.id) !== id; });
+          after = d.posts.length;
+        } else {
+          before = (d.projects || []).length;
+          d.projects = (d.projects || []).filter(function(p) { return String(p.id) !== id; });
+          after = d.projects.length;
+        }
+        if (before === after) throw new Error('Item não encontrado. Recarregue a lista.');
+        return ghWrite(d, sha);
+      })
+      .then(function() {
+        setStatus('admin-manage-status', '✅ Excluído com sucesso!', 'success');
+        loadManage(type);
+      })
+      .catch(function(err) {
+        setStatus('admin-manage-status', '❌ ' + (err.message || 'Erro'), 'error');
+      });
   }
 
 });

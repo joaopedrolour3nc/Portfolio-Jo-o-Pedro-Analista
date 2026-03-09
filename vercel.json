@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/github.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
