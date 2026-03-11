@@ -14,7 +14,7 @@ function updateToggleIcon(theme) {
 }
 
 var ADMIN_PASS = '121246';
-var API_PROXY  = '/api/github'; // Vercel Function
+var API_PROXY  = '/api/github';
 
 function gel(id) { return document.getElementById(id); }
 function gval(id) { var e = gel(id); return e ? e.value.trim() : ''; }
@@ -33,7 +33,6 @@ function setStatus(id, msg, type) {
   e.textContent = msg;
 }
 
-/* Lê SHA + dados via Vercel Function */
 function ghRead() {
   return fetch(API_PROXY + '?_=' + Date.now())
     .then(function(r) {
@@ -42,7 +41,6 @@ function ghRead() {
     });
 }
 
-/* Salva dados via Vercel Function */
 function ghWrite(data, sha) {
   return fetch(API_PROXY, {
     method: 'PUT',
@@ -102,8 +100,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* === ADMIN MODAL === */
-
-  /* Gatilho: 5 cliques no nome */
   var logoName = document.querySelector('.header__logo-name');
   var clicks = 0, timer = null;
   if (logoName) {
@@ -142,7 +138,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (pv) pv.style.display = which === 'panel' ? 'block' : 'none';
   }
 
-  /* Fechar */
   var closeBtn = gel('admin-modal-close'), backdrop = gel('admin-backdrop');
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
   if (backdrop) backdrop.addEventListener('click', closeModal);
@@ -151,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === 'Escape' && m && m.style.display !== 'none') closeModal();
   });
 
-  /* Login — só senha, sem token */
   function doLogin() {
     var inp = gel('admin-pass-input');
     if (!inp) return;
@@ -167,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (passBtn) passBtn.addEventListener('click', doLogin);
   if (passInp) passInp.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
 
-  /* Logout */
   var logoutBtn = gel('admin-logout-btn');
   if (logoutBtn) logoutBtn.addEventListener('click', function() { showView('login'); });
 
