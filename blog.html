@@ -99,6 +99,120 @@
     </div>
   </footer>
 
+  <!-- Admin modal (injetado pelo main.js) -->
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    var REPO_OWNER = 'joaopedrolour3nc';
+    var REPO_NAME  = 'Portfolio-Jo-o-Pedro-Analista';
+    var DATA_FILE  = 'data.json';
+    var BRANCH     = 'main';
+    var RAW_URL    = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + DATA_FILE + '?nocache=' + Date.now();
+
+    function formatPostDate(iso) {
+      var d = new Date(iso);
+      var months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      return d.getDate() + ' de ' + months[d.getMonth()] + ' de ' + d.getFullYear();
+    }
+
+    function showPost(post) {
+      document.getElementById('blog-list-view').style.display = 'none';
+      document.getElementById('blog-footer').style.display = 'none';
+
+      var view = document.getElementById('blog-post-view');
+      view.style.display = 'block';
+
+      document.getElementById('post-view-title').textContent = post.title;
+      document.getElementById('post-view-date').textContent  = formatPostDate(post.date);
+      document.getElementById('post-view-body').innerHTML    = post.content || '';
+      document.getElementById('post-view-tags').innerHTML    = (post.tags || [])
+        .map(function(t){ return '<span class="chip">' + t + '</span>'; }).join('');
+
+      // Autor
+      var authorEl = document.getElementById('post-view-author');
+      if (authorEl) authorEl.textContent = post.author ? 'por ' + post.author : '';
+
+      // Imagem de capa
+      var coverEl = document.getElementById('post-view-cover');
+      if (coverEl) {
+        if (post.image) { coverEl.src = post.image; coverEl.style.display = 'block'; }
+        else { coverEl.style.display = 'none'; }
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.title = post.title + ' — João Pedro';
+    }
+
+    function showList() {
+      document.getElementById('blog-post-view').style.display  = 'none';
+      document.getElementById('blog-list-view').style.display  = 'block';
+      document.getElementById('blog-footer').style.display     = '';
+      document.title = 'Blog — João Pedro · Analista de Dados';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('post-back-btn').addEventListener('click', showList);
+
+    function renderPosts(posts) {
+      document.getElementById('blog-loading').style.display = 'none';
+
+      if (!posts || posts.length === 0) {
+        document.getElementById('blog-empty').style.display = 'block';
+        return;
+      }
+
+      posts.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+
+      var grid = document.getElementById('blog-grid');
+      grid.style.display = 'grid';
+      grid.innerHTML = '';
+
+      posts.forEach(function(post) {
+        var tags = (post.tags || []).map(function(t){ return '<span class="chip">' + t + '</span>'; }).join('');
+        var plain = (post.content || '').replace(/<[^>]*>/g, '');
+        var preview = plain.length > 180 ? plain.substring(0, 180) + '…' : plain;
+
+        var coverHtml = post.image
+          ? '<img src="' + post.image + '" alt="' + post.title + '" class="blog-card__cover" loading="lazy" onerror="this.style.display=\'none\'">'
+          : '';
+        var authorHtml = post.author
+          ? '<span class="blog-card__author">por ' + post.author + '</span>'
+          : '';
+
+        var card = document.createElement('article');
+        card.className = 'blog-card';
+        card.innerHTML =
+          coverHtml +
+          '<div class="blog-card__body">' +
+            '<div class="blog-card__meta">' +
+              '<span class="blog-card__date">' + formatPostDate(post.date) + '</span>' +
+              authorHtml +
+            '</div>' +
+            '<h2 class="blog-card__title">' + post.title + '</h2>' +
+            '<p class="blog-card__preview">' + preview + '</p>' +
+            '<div class="chips blog-card__tags">' + tags + '</div>' +
+            '<button class="btn btn--outline btn--sm blog-card__btn">Ler artigo →</button>' +
+          '</div>';
+
+        card.querySelector('.blog-card__btn').addEventListener('click', function(){ showPost(post); });
+        card.addEventListener('click', function(e){
+          if (!e.target.closest('button')) showPost(post);
+        });
+        card.style.cursor = 'pointer';
+
+        grid.appendChild(card);
+      });
+    }
+
+    fetch(RAW_URL)
+      .then(function(r){ return r.json(); })
+      .then(function(data){ renderPosts(data.posts || []); })
+      .catch(function(){ 
+        document.getElementById('blog-loading').style.display = 'none';
+        document.getElementById('blog-empty').style.display   = 'block';
+      });
+  </script>
+
   <!-- ===== ADMIN MODAL ===== -->
   <div id="admin-modal" class="admin-modal" role="dialog" aria-modal="true" style="display:none;">
     <div class="admin-modal__backdrop" id="admin-backdrop"></div>
@@ -107,6 +221,7 @@
       <span class="section__label">// acesso restrito</span>
       <h2 class="admin-modal__title">Publicar conteúdo</h2>
 
+      <!-- LOGIN -->
       <div id="admin-login-view">
         <div class="form__group" style="margin-top:20px;">
           <label class="form__label" for="admin-pass-input">Senha</label>
@@ -116,15 +231,24 @@
         <button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">Entrar &rarr;</button>
       </div>
 
+      <!-- PAINEL -->
       <div id="admin-panel-view" style="display:none;">
 
+        <!-- Abas: Novo post / Gerenciar -->
         <div class="admin-nav-tabs" style="margin-top:16px;">
           <button type="button" class="admin-nav-tab admin-nav-tab--active" data-panel="publish">&#x270F;&#xFE0F; Publicar</button>
           <button type="button" class="admin-nav-tab" data-panel="manage">&#x1F5C2; Gerenciar</button>
         </div>
 
+        <!-- PAINEL: PUBLICAR -->
         <div id="admin-publish-panel">
-          <div class="form__group" style="margin-top:12px;">
+          <div class="form__group" style="margin-top:16px;">
+            <label class="form__label" for="admin-gh-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span></label>
+            <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+            <span class="form__error" id="admin-token-error">Token inválido ou sem permissão.</span>
+          </div>
+
+          <div class="form__group">
             <label class="form__label">Publicar em</label>
             <div class="admin-dest-tabs">
               <button type="button" class="admin-dest-tab admin-dest-tab--active" data-dest="blog">&#x270D;&#xFE0F; Blog</button>
@@ -145,7 +269,7 @@
               <input class="form__input" type="text" id="admin-post-author" placeholder="João Pedro" value="João Pedro"/>
             </div>
             <div class="form__group">
-              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(vazio = hoje)</span></label>
+              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(deixe vazio = hoje)</span></label>
               <input class="form__input" type="date" id="admin-post-date"/>
             </div>
           </div>
@@ -155,6 +279,7 @@
             <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI"/>
           </div>
 
+          <!-- Campos de projeto -->
           <div id="admin-project-fields" style="display:none;">
             <div class="form__row">
               <div class="form__group">
@@ -189,6 +314,7 @@
             </div>
           </div>
 
+          <!-- Imagem do post (blog) -->
           <div id="admin-blog-image-field" class="form__group">
             <label class="form__label">Imagem de capa <span style="color:var(--text-muted);font-size:0.62rem;">(opcional)</span></label>
             <div class="image-upload-area">
@@ -232,11 +358,18 @@
           </div>
         </div>
 
+        <!-- PAINEL: GERENCIAR -->
         <div id="admin-manage-panel" style="display:none;">
+          <div class="form__group" style="margin-top:16px;">
+            <label class="form__label" for="admin-manage-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(para excluir)</span></label>
+            <input class="form__input" type="password" id="admin-manage-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+          </div>
+
           <div class="admin-manage-tabs" style="margin-top:12px;">
             <button type="button" class="admin-dest-tab admin-dest-tab--active" data-mtab="posts">Posts</button>
             <button type="button" class="admin-dest-tab" data-mtab="projects">Projetos</button>
           </div>
+
           <div id="admin-manage-list" style="margin-top:16px;">
             <div class="blog-loading" id="admin-manage-loading" style="display:none;">
               <div class="blog-loading__spinner"></div>
