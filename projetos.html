@@ -5,205 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Projetos de João Pedro — dashboards Power BI, análises SQL, pipelines Python e automações Excel." />
   <title>Projetos — João Pedro · Analista de Dados</title>
-  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%234f7cff%22/><text x=%2216%22 y=%2223%22 text-anchor=%22middle%22 font-size=%2218%22 font-family=%22monospace%22 fill=%22white%22>JP</text></svg>" />
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <!-- Tema aplicado antes do render para evitar flash -->
-  <script>
-    (function(){
-      var t = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
+  <script>(function(){ var t=localStorage.getItem('theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
 </head>
 <body>
-
-  <!-- ===== HEADER ===== -->
   <header class="header" role="banner">
     <div class="container header__inner">
       <a href="index.html" class="header__logo" aria-label="Ir para a Home">
         <span class="header__logo-name">João Pedro</span>
         <span class="header__logo-role">Analista de Dados</span>
       </a>
-
-      <button
-        class="nav-toggle"
-        aria-label="Abrir/fechar menu"
-        aria-expanded="false"
-        aria-controls="main-nav"
-      >
-        <span class="nav-toggle__bar"></span>
-        <span class="nav-toggle__bar"></span>
-        <span class="nav-toggle__bar"></span>
+      <button class="nav-toggle" aria-label="Abrir/fechar menu" aria-expanded="false" aria-controls="main-nav">
+        <span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span>
       </button>
-
       <nav class="nav" id="main-nav" role="navigation" aria-label="Menu principal">
         <a href="index.html" class="nav__link">Home</a>
         <a href="projetos.html" class="nav__link">Projetos</a>
         <a href="blog.html" class="nav__link">Blog</a>
         <a href="contato.html" class="nav__link">Contato</a>
       </nav>
-
       <div class="header__actions">
-        <button
-          class="theme-toggle"
-          aria-label="Alternar tema claro/escuro"
-          title="Alternar tema"
-        >
+        <button class="theme-toggle" aria-label="Alternar tema claro/escuro" title="Alternar tema">
           <div class="theme-toggle__knob">🌙</div>
         </button>
       </div>
     </div>
   </header>
-
-  <!-- ===== MAIN ===== -->
   <main class="page">
-
     <div class="container">
-
-      <!-- Cabeçalho da página -->
       <div class="projects-header">
         <span class="section__label">// portfólio</span>
         <h1 class="section__title">Projetos</h1>
-        <p class="section__desc">
-          Trabalhos desenvolvidos nas áreas de Business Intelligence, Análise de Dados, Engenharia de Dados e Automação.
-        </p>
+        <p class="section__desc">Trabalhos desenvolvidos nas áreas de Business Intelligence, Análise de Dados, Engenharia de Dados e Automação.</p>
       </div>
-
-      <!-- Controles de filtro / busca -->
       <div class="projects-controls" role="search" aria-label="Filtros de projetos">
-
         <div class="projects-controls__row">
-          <!-- Busca -->
           <label for="project-search" class="visually-hidden">Buscar projetos</label>
           <div class="search-box">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-            <input
-              type="search"
-              id="project-search"
-              placeholder="Buscar por título, stack…"
-              autocomplete="off"
-            />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="search" id="project-search" placeholder="Buscar por título, stack…" autocomplete="off"/>
           </div>
-
-          <!-- Ordenação -->
           <label for="project-sort" class="visually-hidden">Ordenar projetos</label>
           <select id="project-sort" class="sort-select" aria-label="Ordenar projetos">
             <option value="recente">↓ Mais recente</option>
             <option value="az">A → Z</option>
           </select>
         </div>
-
-        <!-- Filtro por tags -->
         <div class="filter-tags">
           <span class="filter-tags__label">Filtrar:</span>
           <div id="filter-tags" role="group" aria-label="Filtrar por tags"></div>
         </div>
-
       </div>
-
-      <!-- Grid de projetos -->
-      <!-- Loading -->
       <div id="projects-loading" class="blog-loading" style="display:none;">
         <div class="blog-loading__spinner"></div>
         <span>Carregando projetos...</span>
       </div>
-
-      <section
-        class="projects-grid"
-        id="projects-grid"
-        aria-label="Lista de projetos"
-        aria-live="polite"
-      ></section>
-
-      <div style="height: 80px;"></div>
+      <section class="projects-grid" id="projects-grid" aria-label="Lista de projetos" aria-live="polite"></section>
+      <div style="height:80px;"></div>
     </div>
-
   </main>
-
-  <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="container footer__inner">
       <div class="footer__links">
-        <a
-          href="https://github.com/joaopedrolour3nc"
-          target="_blank"
-          rel="noopener"
-          class="footer__link"
-          aria-label="GitHub de João Pedro"
-        >GitHub</a>
-        <a
-          href="https://www.linkedin.com/in/joaopedrolour3nc/"
-          target="_blank"
-          rel="noopener"
-          class="footer__link"
-          aria-label="LinkedIn de João Pedro"
-        >LinkedIn</a>
+        <a href="https://github.com/joaopedrolour3nc" target="_blank" rel="noopener" class="footer__link">GitHub</a>
+        <a href="https://www.linkedin.com/in/joaopedrolour3nc/" target="_blank" rel="noopener" class="footer__link">LinkedIn</a>
       </div>
-      <p class="footer__copy">
-        © <span class="footer__year"></span> João Pedro — Analista de Dados
-      </p>
+      <p class="footer__copy">© <span class="footer__year"></span> João Pedro — Analista de Dados</p>
     </div>
   </footer>
-
-  <script src="assets/js/main.js"></script>
-  <script src="assets/js/projects.js"></script>
-      <!-- Painel pós-login -->
-      <div id="admin-panel-view" style="display:none;">
-
-        <div class="form__group" style="margin-top:20px;">
-          <label class="form__label" for="admin-gh-token">
-            Token do GitHub
-            <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span>
-          </label>
-          <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-          <span class="form__error" id="admin-token-error" role="alert">Token inválido ou sem permissão.</span>
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-title">Título *</label>
-          <input class="form__input" type="text" id="admin-post-title" placeholder="Título do post" />
-          <span class="form__error" id="admin-title-error" role="alert">Informe o título.</span>
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
-          <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI" />
-        </div>
-
-        <div class="form__group">
-          <label class="form__label" for="admin-post-content">Conteúdo *</label>
-          <div class="editor-toolbar editor-toolbar--sm">
-            <button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>
-            <button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>
-            <button type="button" class="editor-btn" data-acmd="h2">H2</button>
-            <button type="button" class="editor-btn" data-acmd="h3">H3</button>
-            <button type="button" class="editor-btn" data-acmd="ul">• Lista</button>
-            <button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>
-            <button type="button" class="editor-btn" data-acmd="blockquote">❝</button>
-          </div>
-          <div id="admin-post-content" class="editor-area editor-area--sm"
-            contenteditable="true" data-placeholder="Escreva o post aqui..."></div>
-          <span class="form__error" id="admin-content-error" role="alert">Escreva o conteúdo.</span>
-        </div>
-
-        <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
-
-        <div class="admin-actions">
-          <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
-          <button class="btn btn--primary" id="admin-publish-btn">Publicar →</button>
-        </div>
-
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-          <a href="blog.html" class="btn btn--outline btn--sm">Ver blog →</a>
-          <button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
 
   <!-- ===== ADMIN MODAL ===== -->
   <div id="admin-modal" class="admin-modal" role="dialog" aria-modal="true" style="display:none;">
@@ -212,8 +82,6 @@
       <button class="admin-modal__close" id="admin-modal-close" aria-label="Fechar">&#x2715;</button>
       <span class="section__label">// acesso restrito</span>
       <h2 class="admin-modal__title">Publicar conteúdo</h2>
-
-      <!-- LOGIN -->
       <div id="admin-login-view">
         <div class="form__group" style="margin-top:20px;">
           <label class="form__label" for="admin-pass-input">Senha</label>
@@ -222,25 +90,13 @@
         </div>
         <button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">Entrar &rarr;</button>
       </div>
-
-      <!-- PAINEL -->
       <div id="admin-panel-view" style="display:none;">
-
-        <!-- Abas: Novo post / Gerenciar -->
         <div class="admin-nav-tabs" style="margin-top:16px;">
           <button type="button" class="admin-nav-tab admin-nav-tab--active" data-panel="publish">&#x270F;&#xFE0F; Publicar</button>
           <button type="button" class="admin-nav-tab" data-panel="manage">&#x1F5C2; Gerenciar</button>
         </div>
-
-        <!-- PAINEL: PUBLICAR -->
         <div id="admin-publish-panel">
           <div class="form__group" style="margin-top:16px;">
-            <label class="form__label" for="admin-gh-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(não salvo)</span></label>
-            <input class="form__input" type="password" id="admin-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
-            <span class="form__error" id="admin-token-error">Token inválido ou sem permissão.</span>
-          </div>
-
-          <div class="form__group">
             <label class="form__label">Publicar em</label>
             <div class="admin-dest-tabs">
               <button type="button" class="admin-dest-tab admin-dest-tab--active" data-dest="blog">&#x270D;&#xFE0F; Blog</button>
@@ -248,30 +104,25 @@
               <button type="button" class="admin-dest-tab" data-dest="both">&#x2726; Ambos</button>
             </div>
           </div>
-
           <div class="form__group">
             <label class="form__label" for="admin-post-title">Título *</label>
             <input class="form__input" type="text" id="admin-post-title" placeholder="Título"/>
             <span class="form__error" id="admin-title-error">Informe o título.</span>
           </div>
-
           <div class="form__row">
             <div class="form__group">
               <label class="form__label" for="admin-post-author">Autor</label>
-              <input class="form__input" type="text" id="admin-post-author" placeholder="João Pedro" value="João Pedro"/>
+              <input class="form__input" type="text" id="admin-post-author" value="João Pedro"/>
             </div>
             <div class="form__group">
-              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(deixe vazio = hoje)</span></label>
+              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(vazio = hoje)</span></label>
               <input class="form__input" type="date" id="admin-post-date"/>
             </div>
           </div>
-
           <div class="form__group">
             <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
             <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI"/>
           </div>
-
-          <!-- Campos de projeto -->
           <div id="admin-project-fields" style="display:none;">
             <div class="form__row">
               <div class="form__group">
@@ -299,34 +150,24 @@
                 <input class="form__input" type="text" id="admin-proj-imagem" placeholder="&#x1F4CA; ou https://..."/>
               </div>
               <div class="form__group" style="display:flex;align-items:flex-end;padding-bottom:4px;">
-                <label class="admin-check-label">
-                  <input type="checkbox" id="admin-proj-destaque"/> Marcar como destaque
-                </label>
+                <label class="admin-check-label"><input type="checkbox" id="admin-proj-destaque"/> Marcar como destaque</label>
               </div>
             </div>
           </div>
-
-          <!-- Imagem do post (blog) -->
           <div id="admin-blog-image-field" class="form__group">
             <label class="form__label">Imagem de capa <span style="color:var(--text-muted);font-size:0.62rem;">(opcional)</span></label>
             <div class="image-upload-area">
-              <label class="image-upload-btn" for="admin-post-image-file">
-                &#x1F4C2; Escolher do computador
-                <input type="file" id="admin-post-image-file" accept="image/*" style="display:none;"/>
-              </label>
+              <label class="image-upload-btn" for="admin-post-image-file">&#x1F4C2; Escolher do computador<input type="file" id="admin-post-image-file" accept="image/*" style="display:none;"/></label>
               <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.7rem;">ou</span>
               <input class="form__input" type="url" id="admin-post-image-url" placeholder="https://url-da-imagem.com/foto.jpg" style="flex:1;min-width:0;"/>
             </div>
             <img id="admin-image-preview" src="" alt="Preview" style="display:none;max-height:140px;border-radius:var(--radius);margin-top:10px;object-fit:cover;width:100%;border:1px solid var(--border);"/>
-            <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.62rem;margin-top:4px;display:block;">Máximo recomendado: 800KB</span>
           </div>
-
           <div id="admin-desc-field" class="form__group" style="display:none;">
             <label class="form__label" for="admin-proj-desc">Descrição curta *</label>
             <textarea class="form__textarea" id="admin-proj-desc" placeholder="Resumo do projeto..." style="min-height:80px;"></textarea>
             <span class="form__error" id="admin-desc-error">Informe a descrição.</span>
           </div>
-
           <div id="admin-editor-field" class="form__group">
             <label class="form__label">Conteúdo *</label>
             <div class="editor-toolbar editor-toolbar--sm">
@@ -341,27 +182,17 @@
             <div id="admin-post-content" class="editor-area editor-area--sm" contenteditable="true" data-placeholder="Escreva o conteúdo aqui..."></div>
             <span class="form__error" id="admin-content-error">Escreva o conteúdo.</span>
           </div>
-
           <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
-
           <div class="admin-actions">
             <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
             <button class="btn btn--primary" id="admin-publish-btn">Publicar &rarr;</button>
           </div>
         </div>
-
-        <!-- PAINEL: GERENCIAR -->
         <div id="admin-manage-panel" style="display:none;">
-          <div class="form__group" style="margin-top:16px;">
-            <label class="form__label" for="admin-manage-token">Token GitHub <span style="color:var(--text-muted);font-size:0.62rem;">(para excluir)</span></label>
-            <input class="form__input" type="password" id="admin-manage-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
-          </div>
-
-          <div class="admin-manage-tabs" style="margin-top:12px;">
+          <div class="admin-dest-tabs" style="margin-top:16px;">
             <button type="button" class="admin-dest-tab admin-dest-tab--active" data-mtab="posts">Posts</button>
             <button type="button" class="admin-dest-tab" data-mtab="projects">Projetos</button>
           </div>
-
           <div id="admin-manage-list" style="margin-top:16px;">
             <div class="blog-loading" id="admin-manage-loading" style="display:none;">
               <div class="blog-loading__spinner"></div>
@@ -371,7 +202,6 @@
           </div>
           <div id="admin-manage-status" class="publish-status" style="display:none;margin-top:12px;"></div>
         </div>
-
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
           <a href="blog.html" class="btn btn--outline btn--sm">Ver blog &rarr;</a>
           <button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>
@@ -380,5 +210,7 @@
     </div>
   </div>
 
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/projects.js"></script>
 </body>
 </html>
