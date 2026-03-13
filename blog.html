@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
+
   <header class="header" role="banner">
     <div class="container header__inner">
       <a href="index.html" class="header__logo" aria-label="Ir para a Home">
@@ -16,13 +17,15 @@
         <span class="header__logo-role">Analista de Dados</span>
       </a>
       <button class="nav-toggle" aria-label="Abrir/fechar menu" aria-expanded="false" aria-controls="main-nav">
-        <span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
       </button>
       <nav class="nav" id="main-nav" role="navigation" aria-label="Menu principal">
-        <a href="index.html" class="nav__link">Home</a>
+        <a href="index.html"    class="nav__link">Home</a>
         <a href="projetos.html" class="nav__link">Projetos</a>
-        <a href="blog.html" class="nav__link">Blog</a>
-        <a href="contato.html" class="nav__link">Contato</a>
+        <a href="blog.html"     class="nav__link">Blog</a>
+        <a href="contato.html"  class="nav__link">Contato</a>
       </nav>
       <div class="header__actions">
         <button class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
@@ -33,6 +36,8 @@
   </header>
 
   <main class="page">
+
+    <!-- LISTA DE POSTS -->
     <div id="blog-list-view">
       <div class="container">
         <div class="projects-header">
@@ -40,24 +45,31 @@
           <h1 class="section__title">Artigos & Insights</h1>
           <p class="section__desc">Análises, aprendizados e reflexões sobre dados, ferramentas e carreira.</p>
         </div>
+
         <div id="blog-loading" class="blog-loading">
           <div class="blog-loading__spinner"></div>
           <span>Carregando posts...</span>
         </div>
+
         <div id="blog-grid" class="blog-grid" style="display:none;"></div>
+
         <div id="blog-empty" class="empty-state" style="display:none;">
           <div class="empty-state__icon">✍️</div>
           <div class="empty-state__title">Nenhum post ainda</div>
           <div class="empty-state__desc">Em breve terei conteúdo por aqui.</div>
         </div>
+
         <div style="height:80px;"></div>
       </div>
     </div>
 
+    <!-- LEITURA DE POST (página inteira) -->
     <div id="blog-post-view" style="display:none;">
       <div class="post-page">
         <div class="container">
-          <button class="post-page__back" id="post-back-btn">← Voltar ao blog</button>
+          <button class="post-page__back" id="post-back-btn">
+            ← Voltar ao blog
+          </button>
           <article class="post-article">
             <header class="post-article__header">
               <div class="post-article__meta">
@@ -74,155 +86,29 @@
         </div>
       </div>
     </div>
+
   </main>
 
   <footer class="footer" id="blog-footer">
     <div class="container footer__inner">
       <div class="footer__links">
-        <a href="https://github.com/joaopedrolour3nc" target="_blank" rel="noopener" class="footer__link">GitHub</a>
+        <a href="https://github.com/joaopedrolour3nc"         target="_blank" rel="noopener" class="footer__link">GitHub</a>
         <a href="https://www.linkedin.com/in/joaopedrolour3nc/" target="_blank" rel="noopener" class="footer__link">LinkedIn</a>
       </div>
       <p class="footer__copy">© <span class="footer__year"></span> João Pedro — Analista de Dados</p>
     </div>
   </footer>
 
-  <!-- ===== ADMIN MODAL ===== -->
-  <div id="admin-modal" class="admin-modal" role="dialog" aria-modal="true" style="display:none;">
-    <div class="admin-modal__backdrop" id="admin-backdrop"></div>
-    <div class="admin-modal__box">
-      <button class="admin-modal__close" id="admin-modal-close" aria-label="Fechar">&#x2715;</button>
-      <span class="section__label">// acesso restrito</span>
-      <h2 class="admin-modal__title">Publicar conteúdo</h2>
-      <div id="admin-login-view">
-        <div class="form__group" style="margin-top:20px;">
-          <label class="form__label" for="admin-pass-input">Senha</label>
-          <input class="form__input" type="password" id="admin-pass-input" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" autocomplete="off"/>
-          <span class="form__error" id="admin-pass-error">Senha incorreta. Tente novamente.</span>
-        </div>
-        <button class="btn btn--primary" id="admin-pass-btn" style="width:100%;justify-content:center;margin-top:4px;">Entrar &rarr;</button>
-      </div>
-      <div id="admin-panel-view" style="display:none;">
-        <div class="admin-nav-tabs" style="margin-top:16px;">
-          <button type="button" class="admin-nav-tab admin-nav-tab--active" data-panel="publish">&#x270F;&#xFE0F; Publicar</button>
-          <button type="button" class="admin-nav-tab" data-panel="manage">&#x1F5C2; Gerenciar</button>
-        </div>
-        <div id="admin-publish-panel">
-          <div class="form__group" style="margin-top:16px;">
-            <label class="form__label">Publicar em</label>
-            <div class="admin-dest-tabs">
-              <button type="button" class="admin-dest-tab admin-dest-tab--active" data-dest="blog">&#x270D;&#xFE0F; Blog</button>
-              <button type="button" class="admin-dest-tab" data-dest="projects">&#x1F4C1; Projetos</button>
-              <button type="button" class="admin-dest-tab" data-dest="both">&#x2726; Ambos</button>
-            </div>
-          </div>
-          <div class="form__group">
-            <label class="form__label" for="admin-post-title">Título *</label>
-            <input class="form__input" type="text" id="admin-post-title" placeholder="Título"/>
-            <span class="form__error" id="admin-title-error">Informe o título.</span>
-          </div>
-          <div class="form__row">
-            <div class="form__group">
-              <label class="form__label" for="admin-post-author">Autor</label>
-              <input class="form__input" type="text" id="admin-post-author" value="João Pedro"/>
-            </div>
-            <div class="form__group">
-              <label class="form__label" for="admin-post-date">Data <span style="color:var(--text-muted);font-size:0.62rem;">(vazio = hoje)</span></label>
-              <input class="form__input" type="date" id="admin-post-date"/>
-            </div>
-          </div>
-          <div class="form__group">
-            <label class="form__label" for="admin-post-tags">Tags <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
-            <input class="form__input" type="text" id="admin-post-tags" placeholder="SQL, Python, Power BI"/>
-          </div>
-          <div id="admin-project-fields" style="display:none;">
-            <div class="form__row">
-              <div class="form__group">
-                <label class="form__label" for="admin-proj-stack">Stack <span style="color:var(--text-muted);font-size:0.62rem;">(vírgula)</span></label>
-                <input class="form__input" type="text" id="admin-proj-stack" placeholder="Python, SQL"/>
-              </div>
-              <div class="form__group">
-                <label class="form__label" for="admin-proj-data">Data do projeto</label>
-                <input class="form__input" type="text" id="admin-proj-data" placeholder="02-2026"/>
-              </div>
-            </div>
-            <div class="form__row">
-              <div class="form__group">
-                <label class="form__label" for="admin-proj-github">Link GitHub</label>
-                <input class="form__input" type="url" id="admin-proj-github" placeholder="https://github.com/..."/>
-              </div>
-              <div class="form__group">
-                <label class="form__label" for="admin-proj-demo">Link Demo</label>
-                <input class="form__input" type="url" id="admin-proj-demo" placeholder="https://..."/>
-              </div>
-            </div>
-            <div class="form__row">
-              <div class="form__group">
-                <label class="form__label" for="admin-proj-imagem">Imagem <span style="color:var(--text-muted);font-size:0.62rem;">(emoji ou URL)</span></label>
-                <input class="form__input" type="text" id="admin-proj-imagem" placeholder="&#x1F4CA; ou https://..."/>
-              </div>
-              <div class="form__group" style="display:flex;align-items:flex-end;padding-bottom:4px;">
-                <label class="admin-check-label"><input type="checkbox" id="admin-proj-destaque"/> Marcar como destaque</label>
-              </div>
-            </div>
-          </div>
-          <div id="admin-blog-image-field" class="form__group">
-            <label class="form__label">Imagem de capa <span style="color:var(--text-muted);font-size:0.62rem;">(opcional)</span></label>
-            <div class="image-upload-area">
-              <label class="image-upload-btn" for="admin-post-image-file">&#x1F4C2; Escolher do computador<input type="file" id="admin-post-image-file" accept="image/*" style="display:none;"/></label>
-              <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.7rem;">ou</span>
-              <input class="form__input" type="url" id="admin-post-image-url" placeholder="https://url-da-imagem.com/foto.jpg" style="flex:1;min-width:0;"/>
-            </div>
-            <img id="admin-image-preview" src="" alt="Preview" style="display:none;max-height:140px;border-radius:var(--radius);margin-top:10px;object-fit:cover;width:100%;border:1px solid var(--border);"/>
-          </div>
-          <div id="admin-desc-field" class="form__group" style="display:none;">
-            <label class="form__label" for="admin-proj-desc">Descrição curta *</label>
-            <textarea class="form__textarea" id="admin-proj-desc" placeholder="Resumo do projeto..." style="min-height:80px;"></textarea>
-            <span class="form__error" id="admin-desc-error">Informe a descrição.</span>
-          </div>
-          <div id="admin-editor-field" class="form__group">
-            <label class="form__label">Conteúdo *</label>
-            <div class="editor-toolbar editor-toolbar--sm">
-              <button type="button" class="editor-btn" data-acmd="bold"><b>B</b></button>
-              <button type="button" class="editor-btn" data-acmd="italic"><i>I</i></button>
-              <button type="button" class="editor-btn" data-acmd="h2">H2</button>
-              <button type="button" class="editor-btn" data-acmd="h3">H3</button>
-              <button type="button" class="editor-btn" data-acmd="ul">&bull; Lista</button>
-              <button type="button" class="editor-btn" data-acmd="code">&lt;/&gt;</button>
-              <button type="button" class="editor-btn" data-acmd="blockquote">&#x275D;</button>
-            </div>
-            <div id="admin-post-content" class="editor-area editor-area--sm" contenteditable="true" data-placeholder="Escreva o conteúdo aqui..."></div>
-            <span class="form__error" id="admin-content-error">Escreva o conteúdo.</span>
-          </div>
-          <div id="admin-publish-status" class="publish-status" style="display:none;margin-bottom:12px;"></div>
-          <div class="admin-actions">
-            <button class="btn btn--outline btn--sm" id="admin-clear-btn">Limpar</button>
-            <button class="btn btn--primary" id="admin-publish-btn">Publicar &rarr;</button>
-          </div>
-        </div>
-        <div id="admin-manage-panel" style="display:none;">
-          <div class="admin-dest-tabs" style="margin-top:16px;">
-            <button type="button" class="admin-dest-tab admin-dest-tab--active" data-mtab="posts">Posts</button>
-            <button type="button" class="admin-dest-tab" data-mtab="projects">Projetos</button>
-          </div>
-          <div id="admin-manage-list" style="margin-top:16px;">
-            <div class="blog-loading" id="admin-manage-loading" style="display:none;">
-              <div class="blog-loading__spinner"></div>
-              <span>Carregando...</span>
-            </div>
-            <div id="admin-manage-items"></div>
-          </div>
-          <div id="admin-manage-status" class="publish-status" style="display:none;margin-top:12px;"></div>
-        </div>
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-          <a href="blog.html" class="btn btn--outline btn--sm">Ver blog &rarr;</a>
-          <button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Admin modal (injetado pelo main.js) -->
 
   <script src="assets/js/main.js"></script>
   <script>
+    var REPO_OWNER = 'joaopedrolour3nc';
+    var REPO_NAME  = 'Portfolio-Jo-o-Pedro-Analista';
+    var DATA_FILE  = 'data.json';
+    var BRANCH     = 'main';
+    var RAW_URL    = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + DATA_FILE + '?nocache=' + Date.now();
+
     function formatPostDate(iso) {
       var d = new Date(iso);
       var months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -232,16 +118,27 @@
     function showPost(post) {
       document.getElementById('blog-list-view').style.display = 'none';
       document.getElementById('blog-footer').style.display = 'none';
+
       var view = document.getElementById('blog-post-view');
       view.style.display = 'block';
+
       document.getElementById('post-view-title').textContent = post.title;
       document.getElementById('post-view-date').textContent  = formatPostDate(post.date);
       document.getElementById('post-view-body').innerHTML    = post.content || '';
-      document.getElementById('post-view-tags').innerHTML    = (post.tags || []).map(function(t){ return '<span class="chip">'+t+'</span>'; }).join('');
+      document.getElementById('post-view-tags').innerHTML    = (post.tags || [])
+        .map(function(t){ return '<span class="chip">' + t + '</span>'; }).join('');
+
+      // Autor
       var authorEl = document.getElementById('post-view-author');
       if (authorEl) authorEl.textContent = post.author ? 'por ' + post.author : '';
+
+      // Imagem de capa
       var coverEl = document.getElementById('post-view-cover');
-      if (coverEl) { if (post.image) { coverEl.src = post.image; coverEl.style.display = 'block'; } else { coverEl.style.display = 'none'; } }
+      if (coverEl) {
+        if (post.image) { coverEl.src = post.image; coverEl.style.display = 'block'; }
+        else { coverEl.style.display = 'none'; }
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
       document.title = post.title + ' — João Pedro';
     }
@@ -258,34 +155,181 @@
 
     function renderPosts(posts) {
       document.getElementById('blog-loading').style.display = 'none';
-      if (!posts || posts.length === 0) { document.getElementById('blog-empty').style.display = 'block'; return; }
+
+      if (!posts || posts.length === 0) {
+        document.getElementById('blog-empty').style.display = 'block';
+        return;
+      }
+
       posts.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+
       var grid = document.getElementById('blog-grid');
       grid.style.display = 'grid';
       grid.innerHTML = '';
+
       posts.forEach(function(post) {
-        var tags = (post.tags || []).map(function(t){ return '<span class="chip">'+t+'</span>'; }).join('');
+        var tags = (post.tags || []).map(function(t){ return '<span class="chip">' + t + '</span>'; }).join('');
         var plain = (post.content || '').replace(/<[^>]*>/g, '');
         var preview = plain.length > 180 ? plain.substring(0, 180) + '…' : plain;
-        var coverHtml = post.image ? '<img src="'+post.image+'" alt="'+post.title+'" class="blog-card__cover" loading="lazy" onerror="this.style.display=\'none\'">' : '';
-        var authorHtml = post.author ? '<span class="blog-card__author">por '+post.author+'</span>' : '';
+
+        var coverHtml = post.image
+          ? '<img src="' + post.image + '" alt="' + post.title + '" class="blog-card__cover" loading="lazy" onerror="this.style.display=\'none\'">'
+          : '';
+        var authorHtml = post.author
+          ? '<span class="blog-card__author">por ' + post.author + '</span>'
+          : '';
+
         var card = document.createElement('article');
         card.className = 'blog-card';
-        card.innerHTML = coverHtml + '<div class="blog-card__body"><div class="blog-card__meta"><span class="blog-card__date">'+formatPostDate(post.date)+'</span>'+authorHtml+'</div><h2 class="blog-card__title">'+post.title+'</h2><p class="blog-card__preview">'+preview+'</p><div class="chips blog-card__tags">'+tags+'</div><button class="btn btn--outline btn--sm blog-card__btn">Ler artigo →</button></div>';
+        card.innerHTML =
+          coverHtml +
+          '<div class="blog-card__body">' +
+            '<div class="blog-card__meta">' +
+              '<span class="blog-card__date">' + formatPostDate(post.date) + '</span>' +
+              authorHtml +
+            '</div>' +
+            '<h2 class="blog-card__title">' + post.title + '</h2>' +
+            '<p class="blog-card__preview">' + preview + '</p>' +
+            '<div class="chips blog-card__tags">' + tags + '</div>' +
+            '<button class="btn btn--outline btn--sm blog-card__btn">Ler artigo →</button>' +
+          '</div>';
+
         card.querySelector('.blog-card__btn').addEventListener('click', function(){ showPost(post); });
-        card.addEventListener('click', function(e){ if (!e.target.closest('button')) showPost(post); });
+        card.addEventListener('click', function(e){
+          if (!e.target.closest('button')) showPost(post);
+        });
         card.style.cursor = 'pointer';
+
         grid.appendChild(card);
       });
     }
 
-    fetch('/api/db?_=' + Date.now())
+    fetch(RAW_URL)
       .then(function(r){ return r.json(); })
       .then(function(data){ renderPosts(data.posts || []); })
-      .catch(function(){
+      .catch(function(){ 
         document.getElementById('blog-loading').style.display = 'none';
         document.getElementById('blog-empty').style.display   = 'block';
       });
   </script>
+
+<div id="admin-modal" class="admin-modal">
+    <div class="modal__overlay"></div>
+    <div class="admin-modal__box">
+      <button class="admin-modal__close" onclick="adminClose()" aria-label="Fechar">&#x2715;</button>
+      <span class="section__label">// acesso restrito</span>
+      <h2 class="admin-modal__title">Painel Admin</h2>
+
+      <!-- VIEW: LOGIN -->
+      <div id="admin-view-login" class="admin-view" style="display:flex;flex-direction:column;gap:14px;margin-top:16px;">
+        <div class="admin-field">
+          <label class="admin-label">Senha</label>
+          <input class="admin-input" type="password" id="admin-password" placeholder="••••••" autocomplete="off"/>
+          <span id="admin-login-error" style="display:none;color:var(--danger,#e55);font-size:0.75rem;margin-top:4px;"></span>
+        </div>
+        <button class="btn btn--primary" id="admin-login-btn" style="width:100%;justify-content:center;">Entrar →</button>
+      </div>
+
+      <!-- VIEW: PANEL -->
+      <div id="admin-view-panel" class="admin-view" style="display:none;flex-direction:column;">
+        <!-- Abas principais -->
+        <div class="admin-tabs-row" style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="admin-tab active" data-tab="publicar">✏️ Publicar</button>
+          <button class="admin-tab" data-tab="gerenciar">🗂 Gerenciar</button>
+          <button class="admin-tab" data-tab="pagina">🌐 Página</button>
+        </div>
+
+        <!-- TAB: PUBLICAR -->
+        <div id="admin-tab-publicar" class="admin-tab-content" style="display:block;padding-top:14px;">
+          <div style="display:flex;gap:6px;margin-bottom:14px;">
+            <button class="dest-tab active" data-dest="post">✍️ Blog</button>
+            <button class="dest-tab" data-dest="projeto">📁 Projeto</button>
+            <button class="dest-tab" data-dest="ambos">⚡ Ambos</button>
+          </div>
+
+          <!-- Campos post -->
+          <div class="admin-field"><label class="admin-label">Título *</label><input class="admin-input" type="text" id="pub-title" placeholder="Título do post"/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="admin-field"><label class="admin-label">Autor</label><input class="admin-input" type="text" id="pub-author" value="João Pedro"/></div>
+            <div class="admin-field"><label class="admin-label">Data</label><input class="admin-input" type="date" id="pub-date"/></div>
+          </div>
+          <div class="admin-field"><label class="admin-label">Tags (vírgula)</label><input class="admin-input" type="text" id="pub-tags" placeholder="SQL, Python"/></div>
+          <div class="admin-field">
+            <label class="admin-label">Imagem de capa</label>
+            <div class="image-upload-area">
+              <label class="image-upload-btn" for="pub-image-input">📂 Escolher<input type="file" id="pub-image-input" accept="image/*" style="display:none;"/></label>
+              <input type="hidden" id="pub-image-b64"/>
+            </div>
+            <img id="pub-image-preview" src="" alt="" style="display:none;max-height:100px;border-radius:8px;margin-top:8px;width:100%;object-fit:cover;border:1px solid var(--border);"/>
+          </div>
+          <div class="admin-field"><label class="admin-label">Conteúdo *</label><textarea class="admin-input admin-textarea" id="pub-content" placeholder="Escreva o conteúdo..." style="min-height:100px;"></textarea></div>
+
+          <!-- Campos projeto -->
+          <div id="proj-fields" style="display:none;">
+            <hr style="border-color:var(--border);margin:10px 0;"/>
+            <div class="admin-field"><label class="admin-label">Título do projeto *</label><input class="admin-input" type="text" id="pub-proj-titulo" placeholder="Nome do projeto"/></div>
+            <div class="admin-field"><label class="admin-label">Descrição curta</label><textarea class="admin-input admin-textarea" id="pub-proj-desc" style="min-height:60px;"></textarea></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="admin-field"><label class="admin-label">Stack (vírgula)</label><input class="admin-input" type="text" id="pub-proj-stack" placeholder="Python, SQL"/></div>
+              <div class="admin-field"><label class="admin-label">Data (MM-YYYY)</label><input class="admin-input" type="text" id="pub-proj-data" placeholder="03-2026"/></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="admin-field"><label class="admin-label">GitHub URL</label><input class="admin-input" type="url" id="pub-proj-github" placeholder="https://github.com/..."/></div>
+              <div class="admin-field"><label class="admin-label">Demo URL</label><input class="admin-input" type="url" id="pub-proj-demo" placeholder="https://..."/></div>
+            </div>
+            <div class="admin-field"><label class="admin-label">Tags (vírgula)</label><input class="admin-input" type="text" id="pub-proj-tags" placeholder="BI, Análise"/></div>
+            <div class="admin-field">
+              <label class="admin-label">Imagem do projeto</label>
+              <div class="image-upload-area">
+                <label class="image-upload-btn" for="pub-proj-image-input">📂 Escolher<input type="file" id="pub-proj-image-input" accept="image/*" style="display:none;"/></label>
+                <input type="hidden" id="pub-proj-image-b64"/>
+              </div>
+              <img id="pub-proj-image-preview" src="" alt="" style="display:none;max-height:100px;border-radius:8px;margin-top:8px;width:100%;object-fit:cover;border:1px solid var(--border);"/>
+            </div>
+            <div class="admin-field" style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="pub-proj-destaque" style="width:16px;height:16px;cursor:pointer;"/>
+              <label for="pub-proj-destaque" class="admin-label" style="margin:0;cursor:pointer;">Marcar como destaque ★</label>
+            </div>
+          </div>
+
+          <div id="pub-status" class="admin-status" style="display:none;margin-top:10px;"></div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn--outline btn--sm" onclick="clearPublicarForm()">Limpar</button>
+            <button class="btn btn--primary" id="pub-submit-btn">Publicar →</button>
+          </div>
+        </div>
+
+        <!-- TAB: GERENCIAR -->
+        <div id="admin-tab-gerenciar" class="admin-tab-content" style="display:none;padding-top:14px;">
+          <div style="display:flex;gap:6px;margin-bottom:14px;">
+            <button class="ger-tab active" data-ger="posts">Posts</button>
+            <button class="ger-tab" data-ger="projetos">Projetos</button>
+          </div>
+          <div id="ger-tab-posts" class="ger-tab-content">
+            <div id="ger-posts-list" class="ger-list"></div>
+          </div>
+          <div id="ger-tab-projetos" class="ger-tab-content" style="display:none;">
+            <div id="ger-projects-list" class="ger-list"></div>
+          </div>
+          <div id="ger-status" class="admin-status" style="display:none;margin-top:10px;"></div>
+        </div>
+
+        <!-- TAB: PÁGINA -->
+        <div id="admin-tab-pagina" class="admin-tab-content" style="display:none;padding-top:14px;">
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;">Edite o conteúdo exibido em cada seção do site.</p>
+          <div id="content-editor"></div>
+          <div id="content-status" class="admin-status" style="display:none;margin-top:10px;"></div>
+          <button class="btn btn--primary" id="content-save-btn" style="margin-top:12px;width:100%;justify-content:center;">💾 Salvar alterações</button>
+        </div>
+
+        <!-- Footer do painel -->
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <a href="blog.html" class="btn btn--outline btn--sm">Ver blog →</a>
+          <button class="btn btn--outline btn--sm" id="admin-logout-btn" style="color:var(--text-muted);">Sair</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

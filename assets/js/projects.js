@@ -1,12 +1,6 @@
 /* ============================================================
-   projects.js — Carrega projetos do data.json (GitHub raw)
+   projects.js — Carrega projetos do Turso via /api/db
    ============================================================ */
-
-var REPO_OWNER  = 'joaopedrolour3nc';
-var REPO_NAME   = 'Portfolio-Jo-o-Pedro-Analista';
-var DATA_FILE   = 'data.json';
-var BRANCH      = 'main';
-var RAW_BASE    = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/';
 
 var activeFilters = new Set();
 var searchQuery   = '';
@@ -18,18 +12,16 @@ function formatProjectDate(data) {
   var parts  = data.split('-');
   var months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   if (parts.length === 3) {
-    // DD-MM-YYYY
     var m = parseInt(parts[1], 10);
     return parts[0] + ' ' + (months[m-1] || '') + ' ' + parts[2];
   }
-  // MM-YYYY
   var m = parseInt(parts[0], 10);
   return (months[m-1] || '') + ' ' + parts[1];
 }
 
 function getAllTags() {
   var tags = new Set();
-  ALL_PROJECTS.forEach(function(p) { p.tags.forEach(function(t) { tags.add(t); }); });
+  ALL_PROJECTS.forEach(function(p) { (p.tags || []).forEach(function(t) { tags.add(t); }); });
   return Array.from(tags).sort();
 }
 
@@ -37,22 +29,22 @@ function filteredProjects() {
   var result = ALL_PROJECTS.slice();
   if (activeFilters.size > 0) {
     result = result.filter(function(p) {
-      return p.tags.some(function(t) { return activeFilters.has(t); });
+      return (p.tags || []).some(function(t) { return activeFilters.has(t); });
     });
   }
   if (searchQuery.trim()) {
     var q = searchQuery.toLowerCase();
     result = result.filter(function(p) {
-      return p.titulo.toLowerCase().includes(q) ||
-             p.descricaoCurta.toLowerCase().includes(q) ||
-             p.stack.some(function(s) { return s.toLowerCase().includes(q); }) ||
-             p.tags.some(function(t) { return t.toLowerCase().includes(q); });
+      return (p.titulo || '').toLowerCase().includes(q) ||
+             (p.descricaoCurta || '').toLowerCase().includes(q) ||
+             (p.stack || []).some(function(s) { return s.toLowerCase().includes(q); }) ||
+             (p.tags || []).some(function(t) { return t.toLowerCase().includes(q); });
     });
   }
   if (sortOrder === 'recente') {
-    result.sort(function(a, b) { return b.data.localeCompare(a.data); });
+    result.sort(function(a, b) { return (b.data || '').localeCompare(a.data || ''); });
   } else {
-    result.sort(function(a, b) { return a.titulo.localeCompare(b.titulo); });
+    result.sort(function(a, b) { return (a.titulo || '').localeCompare(b.titulo || ''); });
   }
   return result;
 }
@@ -75,7 +67,7 @@ function renderProjects() {
 
   list.forEach(function(p) {
     var card = document.createElement('article');
-    card.className = 'project-card';
+    card.className = 'project-card animate-on-scroll';
 
     var isUrl = p.imagem && (p.imagem.startsWith('http') || p.imagem.startsWith('/') || p.imagem.startsWith('./') || p.imagem.startsWith('assets/'));
     var imgHtml = p.imagem
@@ -84,9 +76,9 @@ function renderProjects() {
         : '<div class="project-card__img">' + p.imagem + '</div>'
       : '';
 
-    var badgeHtml  = p.destaque ? '<span class="badge-destaque">★ Destaque</span>' : '';
-    var stackHtml  = p.stack.map(function(s) { return '<span class="chip">' + s + '</span>'; }).join('');
-    var tagsHtml   = p.tags.map(function(t)  { return '<span class="tag">#' + t + '</span>'; }).join('');
+    var badgeHtml = p.destaque ? '<span class="badge-destaque">★ Destaque</span>' : '';
+    var stackHtml = (p.stack || []).map(function(s) { return '<span class="chip">' + s + '</span>'; }).join('');
+    var tagsHtml  = (p.tags  || []).map(function(t) { return '<span class="tag">#' + t + '</span>'; }).join('');
 
     var githubBtn = p.links && p.links.github
       ? '<a href="' + p.links.github + '" target="_blank" rel="noopener" class="btn btn--outline btn--sm btn--icon">' +
@@ -113,6 +105,9 @@ function renderProjects() {
 
     grid.appendChild(card);
   });
+
+  // trigger scroll animations for new cards
+  if (window._observeAnimations) window._observeAnimations();
 }
 
 function renderFilterTags() {
@@ -145,10 +140,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   showProjectsLoading(true);
 
-  fetch(RAW_BASE + DATA_FILE + '?nocache=' + Date.now())
+  fetch('/api/db?_=' + Date.now())
     .then(function(r) { return r.json(); })
     .then(function(data) {
       ALL_PROJECTS = data.projects || [];
+
+      // Apply site content to projetos page
+      var c = data.content || {};
+      var h1 = document.querySelector('.projects-header .section__title');
+      var desc = document.querySelector('.projects-header .section__desc');
+      if (h1 && c.projetos_title) h1.textContent = c.projetos_title;
+      if (desc && c.projetos_desc) desc.textContent = c.projetos_desc;
+
       showProjectsLoading(false);
       renderFilterTags();
       renderProjects();
