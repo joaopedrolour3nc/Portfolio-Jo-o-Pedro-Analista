@@ -98,7 +98,7 @@ function initCounters() {
       if (entry.isIntersecting) { animateCounter(entry.target); obs.unobserve(entry.target); }
     });
   }, { threshold: 0.5 });
-  document.querySelectorAll('.stat__value[data-target]').forEach(function(el) { obs.observe(el); });
+  document.querySelectorAll('.metric__value[data-target], .stat__value[data-target]').forEach(function(el) { obs.observe(el); });
 }
 
 /* ============================================================
@@ -119,45 +119,90 @@ function applyContent(c) {
     if (!val) return;
     document.querySelectorAll(sel).forEach(function(el) { el.innerHTML = val; });
   }
+  // NAV
   var navLinks = document.querySelectorAll('.nav__link');
-  ['nav_home','nav_projetos','nav_blog','nav_contato'].forEach(function(k,i) {
-    if (navLinks[i] && c[k]) navLinks[i].textContent = c[k];
+  ['nav_home','nav_projetos','nav_blog','nav_contato'].forEach(function(k,i){
+    if(navLinks[i]&&c[k]) navLinks[i].textContent=c[k];
   });
+
+  // HERO
   setText('.hero__eyebrow', c.hero_eyebrow);
   setText('.hero__title',   c.hero_title);
   setText('.hero__subtitle',c.hero_subtitle);
-  var hb = document.querySelectorAll('.hero__actions .btn');
-  if (hb[0]) { if(c.hero_btn1_text) hb[0].textContent=c.hero_btn1_text; if(c.hero_btn1_link) hb[0].href=c.hero_btn1_link; }
-  if (hb[1]) { if(c.hero_btn2_text) hb[1].textContent=c.hero_btn2_text; if(c.hero_btn2_link) hb[1].href=c.hero_btn2_link; }
-  setText('.sobre__label', c.sobre_label); setText('.sobre__title', c.sobre_title);
-  var sp = document.querySelectorAll('.sobre__text p');
+  var hb=document.querySelectorAll('.hero__actions .btn');
+  if(hb[0]){if(c.hero_btn1_text)hb[0].textContent=c.hero_btn1_text;if(c.hero_btn1_link)hb[0].href=c.hero_btn1_link;}
+  if(hb[1]){if(c.hero_btn2_text)hb[1].textContent=c.hero_btn2_text;if(c.hero_btn2_link)hb[1].href=c.hero_btn2_link;}
+
+  // SOBRE — id="sobre-title", #sobre .section__label, .about__text p
+  var sobreTitle=document.getElementById('sobre-title');
+  if(sobreTitle&&c.sobre_title) sobreTitle.innerHTML=c.sobre_title;
+  var sobreLabel=document.querySelector('#sobre .section__label');
+  if(sobreLabel&&c.sobre_label) sobreLabel.textContent=c.sobre_label;
+  var sp=document.querySelectorAll('.about__text p');
   if(sp[0]&&c.sobre_p1) sp[0].innerHTML=c.sobre_p1;
   if(sp[1]&&c.sobre_p2) sp[1].innerHTML=c.sobre_p2;
   if(sp[2]&&c.sobre_p3) sp[2].innerHTML=c.sobre_p3;
-  setText('.skills__label', c.skills_label); setText('.skills__title', c.skills_title); setText('.skills__desc', c.skills_desc);
-  if (c.skills_list) { var sc=document.querySelector('.skills__chips'); if(sc) sc.innerHTML=c.skills_list.split(',').map(function(s){return '<span class="chip">'+s.trim()+'</span>';}).join(''); }
-  if (c.habilidades) {
-    try {
-      var habs = typeof c.habilidades==='string' ? JSON.parse(c.habilidades) : c.habilidades;
-      var hl = document.querySelector('.habilidades__list');
-      if (hl) { hl.innerHTML=habs.map(function(h){return '<div class="habilidade-item animate-on-scroll"><div class="habilidade-item__header"><span class="habilidade-item__nome">'+h.nome+'</span><span class="habilidade-item__pct">'+h.pct+'%</span></div><div class="habilidade-item__bar"><div class="habilidade-item__fill" style="width:'+h.pct+'%"></div></div></div>';}).join(''); if(window._observeAnimations) window._observeAnimations(); }
-    } catch(e) {}
+
+  // HABILIDADES (barras) — .about__stat-list .about__stat-item
+  if(c.habilidades){
+    try{
+      var habs=typeof c.habilidades==='string'?JSON.parse(c.habilidades):c.habilidades;
+      var sl2=document.querySelector('.about__stat-list');
+      if(sl2) sl2.innerHTML=habs.map(function(h){
+        return '<div class="about__stat-item"><span>'+h.nome+'</span>'+
+          '<div class="about__stat-bar"><div class="about__stat-fill" style="width:'+h.pct+'%"></div></div></div>';
+      }).join('');
+    }catch(e){}
   }
-  setText('.metrics__label', c.metrics_label); setText('.metrics__title', c.metrics_title);
-  var sv=document.querySelectorAll('.stat__value'), sl=document.querySelectorAll('.stat__label');
-  [c.metric1_value,c.metric2_value,c.metric3_value].forEach(function(v,i){ if(sv[i]&&v){sv[i].setAttribute('data-target',v);sv[i].textContent=v;} });
-  [c.metric1_label,c.metric2_label,c.metric3_label].forEach(function(v,i){ if(sl[i]&&v) sl[i].textContent=v; });
+
+  // SKILLS — id="skills-title", #habilidades .section__label, .section__desc, .skills__grid .skill-chip
+  var skillsTitle=document.getElementById('skills-title');
+  if(skillsTitle&&c.skills_title) skillsTitle.innerHTML=c.skills_title;
+  var skillsLabel=document.querySelector('#habilidades .section__label');
+  if(skillsLabel&&c.skills_label) skillsLabel.textContent=c.skills_label;
+  var skillsDesc=document.querySelector('#habilidades .section__desc');
+  if(skillsDesc&&c.skills_desc) skillsDesc.textContent=c.skills_desc;
+  if(c.skills_list){
+    var sg=document.querySelector('.skills__grid');
+    if(sg) sg.innerHTML=c.skills_list.split(',').map(function(s){
+      return '<span class="skill-chip" role="listitem">'+s.trim()+'</span>';
+    }).join('');
+  }
+
+  // MÉTRICAS — id="metrics-title", #destaques .section__label, .metric__value, .metric__label
+  var metricsTitle=document.getElementById('metrics-title');
+  if(metricsTitle&&c.metrics_title) metricsTitle.innerHTML=c.metrics_title;
+  var metricsLabel=document.querySelector('#destaques .section__label');
+  if(metricsLabel&&c.metrics_label) metricsLabel.textContent=c.metrics_label;
+  var mv=document.querySelectorAll('.metric__value');
+  var ml=document.querySelectorAll('.metric__label');
+  [c.metric1_value,c.metric2_value,c.metric3_value].forEach(function(v,i){
+    if(mv[i]&&v){mv[i].setAttribute('data-target',v);mv[i].textContent=v;}
+  });
+  [c.metric1_label,c.metric2_label,c.metric3_label].forEach(function(v,i){
+    if(ml[i]&&v) ml[i].textContent=v;
+  });
   initCounters();
-  setText('.contato__title', c.contato_title); setText('.contato__desc', c.contato_desc);
+
+  // CONTATO
+  setText('.contato__title', c.contato_title);
+  setText('.contato__desc',  c.contato_desc);
   setText('.disponivel-badge', c.contato_disponivel);
   if(c.contato_email){var ea=document.querySelector('a[href^="mailto"]');if(ea){ea.href='mailto:'+c.contato_email;var cv=ea.querySelector('.contact-card__value');if(cv)cv.textContent=c.contato_email;}}
   if(c.contato_linkedin){var la=document.querySelector('a[href*="linkedin"]');if(la)la.href=c.contato_linkedin;}
   if(c.contato_github) document.querySelectorAll('a[href*="github.com"]').forEach(function(a){if(!a.classList.contains('btn'))a.href=c.contato_github;});
-  setText('.contato__loc-title', c.contato_localizacao); setText('.contato__loc-sub', c.contato_localizacao_sub);
-  setText('.blog-header .section__title', c.blog_title); setText('.blog-header .section__desc', c.blog_desc);
-  setText('.projects-header .section__title', c.projetos_title); setText('.projects-header .section__desc', c.projetos_desc);
-  if(c.footer_github)   document.querySelectorAll('.footer__social a[href*="github"]').forEach(function(a){a.href=c.footer_github;});
-  if(c.footer_linkedin) document.querySelectorAll('.footer__social a[href*="linkedin"]').forEach(function(a){a.href=c.footer_linkedin;});
+  setText('.contato__loc-title', c.contato_localizacao);
+  setText('.contato__loc-sub',   c.contato_localizacao_sub);
+
+  // BLOG / PROJETOS page headers
+  setText('.blog-header .section__title',     c.blog_title);
+  setText('.blog-header .section__desc',      c.blog_desc);
+  setText('.projects-header .section__title', c.projetos_title);
+  setText('.projects-header .section__desc',  c.projetos_desc);
+
+  // FOOTER
+  if(c.footer_github)   document.querySelectorAll('.footer__link[href*="github"]').forEach(function(a){a.href=c.footer_github;});
+  if(c.footer_linkedin) document.querySelectorAll('.footer__link[href*="linkedin"]').forEach(function(a){a.href=c.footer_linkedin;});
 }
 
 /* ============================================================
